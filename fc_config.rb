@@ -1,42 +1,27 @@
 require_relative "dsl"
-
+require_relative "yaml_io"
 require "yaml"
+require "fileutils"
 
-@modifications = {}
-@creations = {}
+@operations = {}
 
-def create(platform, file, &actions)
-  path = "#{platform.to_s}/#{file}"
-  @creations[path] = actions
-end
-
-def modify(platform, file, &actions)
-  path = "#{platform.to_s}/#{file}"
-  @modifications[path] = actions
-end
-
-def read_from(path)
-  YAML.load_file(File.open(path))
-end
-
-def write_to(path, content)
-  File.open(path, 'w') do |f|
-    YAML.dump(content, f)
+def define_operation(name)
+  Kernel.send :define_method, name do |platform, file, &actions|
+    path = "#{platform.to_s}/#{file}"
+    @operations[path] = actions
   end
 end
+
+[:create, :modify].each { |name| define_operation name }
 
 deploy_descriptor = ARGV[0]
 raise "File not exist - #{deploy_descriptor}" unless File.exist? deploy_descriptor 
 load deploy_descriptor 
 
-@modifications.each_pair do |path, actions|
+@operations.each_pair do |path, actions|
+  yaml = YamlIO.new
   dsl = DSL.new
-  
-  content = read_from path
-  
-  puts "content = #{content}"
-  
-  dsl.content = content
+  dsl.content = yaml.from path
   dsl.instance_eval &actions
-  write_to path, dsl.content
+  yaml.to "output/#{path}", dsl.content
 end

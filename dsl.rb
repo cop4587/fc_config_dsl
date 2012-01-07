@@ -1,39 +1,44 @@
-
-# entry = key + block
-
 class DSL
-  
   attr_accessor :content
-
+  
+  def initialize
+    @elements = {}
+  end
+  
   def add(key, &block)
-    elements = {}
-    elements.merge!(block.call)
-    entry = {}
-    entry[key] = elements
-    puts "add entry = #{entry}"
-  end
-  
-  def upd(key, &elements)
-    puts "upd #{key}"
-    elements.call if elements
-  end
-  
-  def del(key)
-    puts "del #{key}"
-  end
-  
-  def _(element)
-    element
-  end
+    @elements.clear
+    block.call    
 
-=begin
-  def self.define_action(name)
-    define_method(name) do |key, &elements|
-      puts "#{name} #{key}"
-      elements.call if elements
+    entry = {}
+    entry[key] = @elements.clone
+    @content.merge! entry
+  end
+  
+  def upd(key, &block)
+    raise "Entry not found - #{key}" unless @content[key]
+    
+    @elements.clear
+    block.call
+    
+    @elements.each_pair do |element_k, element_v|
+      raise "Element not found - #{element_k} " unless @content[key][element_k]
+      @content[key][element_k] = element_v
     end
   end
   
-  [:add, :upd, :del].each { |name| define_action name }
-=end  
+  def del(key)
+    @content.delete key
+  end
+  
+  def _(element)
+    @elements.merge! stringify(element)
+  end
+  
+  private 
+  
+  def stringify(hash)
+    result = {}
+    result[hash.keys[0].to_s] = hash.values[0].to_s
+    result
+  end
 end

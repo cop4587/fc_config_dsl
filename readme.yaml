@@ -1,0 +1,6 @@
+TERMS:
+  - operation: file operations - create, modify
+  - action: entry actions - add, upd, del
+  - entry:
+    - yaml: key + block (contains elements)
+    - conf: key + value
