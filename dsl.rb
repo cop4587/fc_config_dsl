@@ -1,3 +1,5 @@
+module Deployment
+
 class DSL
   attr_accessor :content
   
@@ -16,7 +18,6 @@ class DSL
   
   def upd(key, &block)
     raise "Entry not found - #{key}" unless @content[key]
-    
     @elements.clear
     block.call
     
@@ -27,6 +28,7 @@ class DSL
   end
   
   def del(key)
+    raise "Entry not found - #{key}" unless @content[key]
     @content.delete key
   end
   
@@ -41,4 +43,5 @@ class DSL
     result[hash.keys[0].to_s] = hash.values[0].to_s
     result
   end
+end
 end

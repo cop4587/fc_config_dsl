@@ -9,7 +9,7 @@ X create
   X add
 
 X output to output/e<n>/
-. re-open
+X re-open
 . module_support
 
     
