@@ -1,4 +1,4 @@
-module YamlIO
+module YamlUtils
   def yaml_from(path)
     File.exist?(path) ? YAML.load_file(File.open path) : {}
   end

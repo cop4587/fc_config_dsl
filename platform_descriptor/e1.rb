@@ -8,7 +8,6 @@ deploy :IMBS do
 
       upd 'entry_1' do
         _ key_10: 'upd 10'
-        _ key_11: 'upd 11'
       end
 
       add 'entry_2' do

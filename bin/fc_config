@@ -1,9 +1,12 @@
-require_relative "dsl"
-require_relative "yaml_io"
+#!/usr/bin/env ruby
+
 require "yaml"
 require "fileutils"
 
-include YamlIO
+require_relative "../lib/dsl"
+require_relative "../lib/yamlutils"
+
+include YamlUtils
 
 MODULES = [:IMBS, :IMAS, :QS]
 ITEMS   = [:conf, :data, :bin]

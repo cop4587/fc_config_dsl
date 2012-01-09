@@ -12,4 +12,12 @@ X output to output/e<n>/
 X re-open
 X module_support
 
+. create gem
+
+. project structure
+  . platform_descriptor/
+  . lib/
+  . bin/
+. add unit test
+
     
