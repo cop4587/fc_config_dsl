@@ -23,7 +23,7 @@ X project structure
 X platform_descriptor/e<n>/e<n>.rb
 
 X create gem
-. add unit test
+X add unit test
 
 CONF
 
@@ -31,7 +31,3 @@ CONF
 . create: add
 . output/e<e>
 . re-open module
-
-GENERAL
-
-. create rakefile

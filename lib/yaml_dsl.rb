@@ -1,6 +1,6 @@
 module Deployment
 
-  class DSL
+  class YamlDSL
 
     attr_accessor :content
 

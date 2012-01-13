@@ -3,10 +3,10 @@
 require "yaml"
 require "fileutils"
 
-require_relative "../lib/dsl"
-require_relative "../lib/yamlutils"
+require_relative "../lib/yaml_dsl"
+require_relative "../lib/yaml_util"
 
-include YamlUtils
+include YamlUtil
 
 MODULES = [:IMBS, :IMAS, :QS]
 ITEMS   = [:conf, :data, :bin]
@@ -54,7 +54,7 @@ end
 load_platform_descriptor!
 
 @operations.each_pair do |path, action_bundle_chain|
-  dsl = Deployment::DSL.new
+  dsl = Deployment::YamlDSL.new
   dsl.content = yaml_from path
 
   action_bundle_chain.each do |action_bundle|

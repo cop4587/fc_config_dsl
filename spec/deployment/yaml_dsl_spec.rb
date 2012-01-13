@@ -1,9 +1,9 @@
 require "spec_helper"
 
-describe "Deployment::DSL - YAML format" do
+describe "Deployment::YamlDSL" do
 
   before(:each) do
-    @dsl = Deployment::DSL.new
+    @dsl = Deployment::YamlDSL.new
   end
 
   describe "add" do

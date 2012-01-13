@@ -2,7 +2,7 @@ deploy :IMBS do
 
   config :data do
 
-    modify :ns, 'data_ns.des' do
+    modify :ns, 'imbs_data_ns_0.des' do
 
       del :entry_0
 
@@ -16,7 +16,7 @@ deploy :IMBS do
       end
     end
 
-    create :ps, 'data_ps.des' do
+    create :ps, 'imbs_data_ps_0.des' do
       add :entry_0 do
         _ :key_00 => 'new 00'
         _ :key_01 => 'new 01'
@@ -28,7 +28,7 @@ deploy :IMBS do
       end
     end
 
-    modify :ns, 'data_ns.des' do
+    modify :ns, 'imbs_data_ns_0.des' do
       add :entry_3 do
         _ :key_30 => 'add 30'
         _ :key_31 => 'add 31'
