@@ -5,9 +5,7 @@ module Deployment
   class ConfDSL < DSL
 
     def add(entry)
-      key = entry.keys[0].to_s
-      val = entry.values[0].to_s
-      @content.merge! key => val
+      @content.merge! stringify(entry)
     end
 
     def upd(entry)

@@ -17,6 +17,7 @@ CONF_FILE_EXT = 'conf'
 YAML_FILE_EXT = 'des'
 
 @operations = {}
+@output_ = {}
 
 def deploy(mod)
   raise "Unknown module - #{mod}. Current supports #{MODULES}" unless MODULES.include? mod
@@ -41,6 +42,12 @@ def load_platform_descriptor!
   load ARGV[0]
 end
 
+def output_(path)
+  file_name = path.split('/')[-1]
+  output_path = "../../output/#@platform/#@mod/#@item/#{file_name}"
+  output_path
+end
+
 def define_operation(name)
   Kernel.send :define_method, name do |group_name, file_name, &action_bundle|
     group(group_name)
@@ -50,6 +57,7 @@ def define_operation(name)
     action_bundle_chain =  @operations[path]? @operations[path] : []
     action_bundle_chain << action_bundle
     @operations[path] = action_bundle_chain
+    @output_[path] = output_(path)
   end
 end
 
@@ -66,23 +74,15 @@ def dsl_for(path)
   end
 end
 
-def output_(path)
-  file_name = path.split('/')[-1]
-  output_path = "../../output/#@platform/#@mod/#@item/#{file_name}"
-end
-
 load_platform_descriptor!
 
 @operations.each_pair do |path, action_bundle_chain|
-
   dsl = dsl_for path
   dsl.content = from path
-
-  puts "[fc_config:81] dsl.content = #{dsl.content}"
 
   action_bundle_chain.each do |action_bundle|
     dsl.instance_eval &action_bundle
   end
 
-  dump dsl.content, output_(path)
+  dump dsl.content, @output_[path]
 end

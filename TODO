@@ -1,5 +1,10 @@
 COMMON
 
+X fc_config works in production mode
+X mix conf and data (modify and creation)
+. mix IMBS and IMAS
+. various error conditions handling
+
 . copy no change files to output
   - only one group is allowed to be modified at one time,
     thus output contains that group's files only, so no group folder needed.
@@ -27,7 +32,7 @@ X add unit test
 
 CONF
 
-. modify: add / upd / del
+X modify: add / upd / del
 . create: add
 . output/e<e>
 . re-open module
