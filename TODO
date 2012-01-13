@@ -1,23 +1,37 @@
+COMMON
+
+. copy no change files to output
+  - only one group is allowed to be modified at one time,
+    thus output contains that group's files only, so no group folder needed.
+
+. apply group modification constraint
+  - only one group is allowed to be modified in one platform descriptor.
+
 YAML
 
-X modify
-  X add
-  X upd
-  X del
-
-X create
-  X add
-
-X output to output/e<n>/
-X re-open
+X modify: add / upd / del
+X create: add
+X output/e<n>/
+X re-open module
 X module_support
 
-. create gem
+X project structure
+  X platform_descriptor/
+  X lib/
+  X bin/
 
-. project structure
-  . platform_descriptor/
-  . lib/
-  . bin/
+X platform_descriptor/e<n>/e<n>.rb
+
+X create gem
 . add unit test
 
-    
+CONF
+
+. modify: add / upd / del
+. create: add
+. output/e<e>
+. re-open module
+
+GENERAL
+
+. create rakefile

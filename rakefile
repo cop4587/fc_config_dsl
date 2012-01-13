@@ -1,0 +1,20 @@
+require "rake/clean"
+
+namespace :gem do
+
+  desc "Uninstall current fc_config gem"
+  task :uninstall do
+
+  end
+
+  desc "Install new fc_config gem"
+  task :install => [:uninstall] do
+
+  end
+end
+
+namespace :itest do
+
+  CLOBBER.include('output')
+
+end

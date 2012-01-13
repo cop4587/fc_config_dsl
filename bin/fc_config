@@ -40,7 +40,7 @@ end
 def define_operation(name)
   Kernel.send :define_method, name do |group_name, file_name, &action_bundle|
     group(group_name)
-    path = "#@mod/#@item/#@group/#{file_name}"
+    path = "../../#@mod/#@item/#@group/#{file_name}"
     raise "SVN base file not found - #{path}" unless File.exist? path or name == :create
 
     action_bundle_chain =  @operations[path]? @operations[path] : []
@@ -62,7 +62,7 @@ load_platform_descriptor!
   end
 
   file_name = path.split('/')[-1]
-  output_path = "output/#@platform/#@mod/#@item/#{file_name}"
+  output_path = "../../output/#@platform/#@mod/#@item/#{file_name}"
 
   yaml_to output_path, dsl.content
 end
