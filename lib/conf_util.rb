@@ -1,20 +1,22 @@
 module ConfUtil
-  def conf_from(path)
-    File.exist?(path) ? CONF.load_file(File.open path) : {}
+  def from(path)
+    File.exist?(path) ? Conf.load_file(File.open path) : {}
   end
 
-  def conf_to(path, content)
-
+  def dump(content, path)
+    dir = File.dirname path
+    FileUtils.mkpath(dir) unless File.exist? dir
+    File.open(path, 'w') { |f| Conf.dump(content, f) }
   end
 
   class Conf
 
-    CONF_SEPARATOR  = ' : '
+    SEPARATOR  = ' : '
 
     def self.load_file(file)
       result = {}
       file.each_line do |line|
-        key, value = line.strip.split CONF_SEPARATOR
+        key, value = line.strip.split SEPARATOR
         result[key] = value
       end
       result
@@ -22,7 +24,7 @@ module ConfUtil
 
     def self.dump(content, file)
       content.each_pair do |key, value|
-        file.puts "#{key} : #{value}"
+        file.puts "#{key}#{SEPARATOR}#{value}"
       end
     end
   end

@@ -31,3 +31,7 @@ CONF
 . create: add
 . output/e<e>
 . re-open module
+
+REFACTORING
+
+. module ConfUtil has duplication with module YamlUtil

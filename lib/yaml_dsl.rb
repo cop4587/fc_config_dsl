@@ -1,8 +1,8 @@
+require_relative 'dsl'
+
 module Deployment
 
-  class YamlDSL
-
-    attr_accessor :content
+  class YamlDSL < DSL
 
     def initialize
       @elements = {}
@@ -39,13 +39,5 @@ module Deployment
     def _(element)
       @elements.merge! stringify(element)
     end
-
-    private
-
-    def stringify(hash)
-      result = {}
-      result[hash.keys[0].to_s] = hash.values[0].to_s
-      result
-    end
   end
-end # module Deployment
+end

@@ -6,11 +6,15 @@ require "fileutils"
 require_relative "../lib/yaml_dsl"
 require_relative "../lib/yaml_util"
 
-include YamlUtil
+require_relative "../lib/conf_dsl"
+require_relative "../lib/conf_util"
 
 MODULES = [:IMBS, :IMAS, :QS]
 ITEMS   = [:conf, :data, :bin]
 GROUPS  = [:ps, :ns]
+
+CONF_FILE_EXT = 'conf'
+YAML_FILE_EXT = 'des'
 
 @operations = {}
 
@@ -51,18 +55,34 @@ end
 
 [:create, :modify].each { |name| define_operation name }
 
+def dsl_for(path)
+  case path
+    when /\.#{YAML_FILE_EXT}$/
+      include YamlUtil
+      Deployment::YamlDSL.new
+    when /\.#{CONF_FILE_EXT}$/
+      include ConfUtil
+      Deployment::ConfDSL.new
+  end
+end
+
+def output_(path)
+  file_name = path.split('/')[-1]
+  output_path = "../../output/#@platform/#@mod/#@item/#{file_name}"
+end
+
 load_platform_descriptor!
 
 @operations.each_pair do |path, action_bundle_chain|
-  dsl = Deployment::YamlDSL.new
-  dsl.content = yaml_from path
+
+  dsl = dsl_for path
+  dsl.content = from path
+
+  puts "[fc_config:81] dsl.content = #{dsl.content}"
 
   action_bundle_chain.each do |action_bundle|
     dsl.instance_eval &action_bundle
   end
 
-  file_name = path.split('/')[-1]
-  output_path = "../../output/#@platform/#@mod/#@item/#{file_name}"
-
-  yaml_to output_path, dsl.content
+  dump dsl.content, output_(path)
 end
