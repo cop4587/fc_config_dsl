@@ -32,6 +32,9 @@ module Deployment
 
     def del(key)
       key_s = key.to_s
+
+      puts "[yaml_dsl:36] key to del = #{key_s}, @content = #{@content}"
+
       raise "Entry to del not found - #{key_s}" unless @content[key_s]
       @content.delete key_s
     end

@@ -12,5 +12,10 @@ deploy :IMBS do
       add :key_0 => 'new 0'
       add :key_1 => 'new 1'
     end
+
+    modify :ns, 'imbs_conf_ns_0.conf' do
+      upd :key_2 => 'upd 2'
+      add :key_4 => 'add 4'
+    end
   end
 end

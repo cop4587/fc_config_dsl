@@ -1,28 +1,5 @@
 # e4 = e3 + IMAS
 
-deploy :IMAS do
-
-  config :bin do
-
-    modify :ps, 'imas_bin_ps_0.des' do
-      upd :imas_bin_entry_1 do
-        _ :key_0 => 'upd 10'
-        _ :key_1 => 'upd 11'
-      end
-    end
-  end
-
-  config :conf do
-
-    modify :ps, 'imas_conf_ps_0.conf' do
-      del :imas_conf_key_0
-      upd :imas_conf_key_1 => 'upd 1'
-      upd :imas_conf_key_2 => 'upd 2'
-      add :imas_conf_key_3 => 'new 3'
-    end
-  end
-end
-
 deploy :IMBS do
 
   config :conf do
@@ -72,6 +49,29 @@ deploy :IMBS do
         _ :key_30 => 'add 30'
         _ :key_31 => 'add 31'
       end
+    end
+  end
+end
+
+deploy :IMAS do
+
+  config :bin do
+
+    modify :ps, 'imas_bin_ps_0.des' do
+      upd :imas_bin_entry_1 do
+        _ :key_0 => 'upd 10'
+        _ :key_1 => 'upd 11'
+      end
+    end
+  end
+
+  config :conf do
+
+    modify :ps, 'imas_conf_ps_0.conf' do
+      del :imas_conf_key_0
+      upd :imas_conf_key_1 => 'upd 1'
+      upd :imas_conf_key_2 => 'upd 2'
+      add :imas_conf_key_3 => 'new 3'
     end
   end
 end
