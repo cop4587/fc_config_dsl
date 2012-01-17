@@ -1,9 +1,9 @@
 require "yaml"
 
-describe "e4.rb: IMBS -> IMAS" do
+describe "e5.rb: IMAS -> IMBS (e4.rb reversed)" do
 
   before(:all) do
-    @output_root = 'output/e4'
+    @output_root = 'output/e5'
   end
 
   context "imas/" do

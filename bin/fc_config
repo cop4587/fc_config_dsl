@@ -16,11 +16,12 @@ GROUPS  = [:ps, :ns]
 CONF_FILE_EXT = 'conf'
 YAML_FILE_EXT = 'des'
 
-@operations = {}
 @output_ = {}
 
 def deploy(mod)
   raise "Unknown module - #{mod}. Current supports #{MODULES}" unless MODULES.include? mod
+
+  @operations = {}
   @mod = mod.to_s.downcase
   yield if block_given?
 end
