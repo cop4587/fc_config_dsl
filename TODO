@@ -2,8 +2,10 @@ COMMON
 
 X fc_config works in production mode
 X mix conf and data (modify and creation)
+
 X mix IMBS with IMAS - functional tested
-X mix IMAS with IMBS - functional tested - FAILED!
+X mix IMAS with IMBS - functional tested
+
 . various error conditions handling
 
 . copy no change files to output

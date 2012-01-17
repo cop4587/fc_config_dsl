@@ -39,5 +39,15 @@ module Deployment
     def _(element)
       @elements.merge! stringify(element)
     end
+
+    def load(file)
+      @content = File.exist?(file) ? YAML.load_file(File.open file) : {}
+    end
+
+    def dump(path)
+      dir = File.dirname path
+      FileUtils.mkpath(dir) unless File.exist? dir
+      File.open(path, 'w') { |f| YAML.dump(@content, f) }
+    end
   end
 end

@@ -2,3 +2,4 @@
 .idea/**/*
 output/*
 output/**/*
+.DS_Store
