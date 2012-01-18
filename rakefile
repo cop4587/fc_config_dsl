@@ -1,20 +1,47 @@
 require "rake/clean"
+require "fileutils"
+
+task :default => ['spec:all']
 
 namespace :gem do
 
-  desc "Uninstall current fc_config gem"
+  desc "Uninstall fc_config gem"
   task :uninstall do
-
+    sh "gem uninstall -x fc_config"
   end
 
-  desc "Install new fc_config gem"
-  task :install => [:uninstall] do
+  desc "Build fc_config gem"
+  task :build do
+    sh "gem build fc_config.gemspec"
+  end
 
+  desc "Install fc_config gem"
+  task :install do
+    sh "gem install fc_config-0.0.1.gem"
   end
 end
 
-namespace :itest do
+namespace :spec do
 
   CLOBBER.include('output')
 
+  desc "Run unit specs"
+  task :unit do
+    sh "rspec spec/unit/ -f doc"
+  end
+
+  desc "Run functional specs"
+  task :func => [:clobber] do
+    FileUtils.cd "platform_descriptor/e4/"
+    sh "fc_config e4.rb"
+
+    FileUtils.cd "../e5"
+    sh "fc_config e5.rb"
+
+    FileUtils.cd "../.."
+    sh "rspec spec/functional -f doc"
+  end
+
+  desc "Run all specs"
+  task :all => [:unit, :func]
 end

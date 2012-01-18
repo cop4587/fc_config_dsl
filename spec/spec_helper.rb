@@ -1,4 +1,4 @@
 $:<<"../lib/"
 
 require "yaml_dsl"
-require "conf_util"
+require "conf_dsl"
