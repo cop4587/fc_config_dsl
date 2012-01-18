@@ -6,6 +6,8 @@ X mix conf and data (modify and creation)
 X mix IMBS with IMAS - functional tested
 X mix IMAS with IMBS - functional tested
 
+X build project with rake
+
 . various error conditions handling
 
 . copy no change files to output
@@ -14,6 +16,7 @@ X mix IMAS with IMBS - functional tested
 
 YAML
 
+X unit tested
 X modify: add / upd / del
 X create: add
 X output/e<n>/
@@ -28,10 +31,10 @@ X project structure
 X platform_descriptor/e<n>/e<n>.rb
 
 X create gem
-X add unit test
 
 CONF
 
+X unit tested
 X modify: add / upd / del
 X create: add
 X output/e<e>
