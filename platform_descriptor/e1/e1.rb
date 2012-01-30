@@ -16,7 +16,7 @@ deploy :IMBS do
       end
     end
 
-    create :ps, 'imbs_data_ps_0.des' do
+    create :ps, 'imbs_data_ps_new_0.des' do
       add :entry_0 do
         _ :key_00 => 'new 00'
         _ :key_01 => 'new 01'

@@ -2,6 +2,7 @@
 
 require "yaml"
 require "fileutils"
+require "pathname"
 
 require_relative "../lib/yaml_dsl"
 require_relative "../lib/conf_dsl"
@@ -15,6 +16,7 @@ YAML_FILE_EXT = 'des'
 
 @operations = {}
 @output_ = {}
+@modified_files = []
 
 def deploy(mod)
   raise "Unknown module - #{mod}. Current supports #{MODULES}" unless MODULES.include? mod
@@ -69,6 +71,25 @@ def dsl_for(path)
   end
 end
 
+class ModifiedFile
+  attr_reader :dir, :file
+
+  def initialize(path)
+    path_name = Pathname.new(path)
+    @dir  = path_name.dirname.to_s
+    @file = path_name.basename.to_s
+  end
+end
+
+def cp_unchanged_to_output
+  @modified_files.each do |modified|
+    files_to_cp = Dir.entries(modified.dir) - ['.', '..', modified.file]
+    files_to_cp.each do |file|
+      FileUtils.cp "#{modified.dir}/#{file}", output_(file)
+    end
+  end
+end
+
 load_platform_descriptor!
 
 @operations.each_pair do |path, action_bundle_chain|
@@ -80,4 +101,7 @@ load_platform_descriptor!
   end
 
   dsl.dump @output_[path]
+  @modified_files << ModifiedFile.new(path)
 end
+
+cp_unchanged_to_output
