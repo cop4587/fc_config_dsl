@@ -18,7 +18,7 @@ YAML_FILE_EXT = 'des'
 @output_ = {}
 
 @modified_files = Hash.new []
-@output_dir = {}
+@dest_ = {}
 
 def deploy(mod)
   raise "Unknown module - #{mod}. Current supports #{MODULES}" unless MODULES.include? mod
@@ -79,14 +79,14 @@ def register_modified(path)
   file = path_name.basename.to_s
   @modified_files[dir] = @modified_files[dir] << file
 
-  @output_dir[dir] = Pathname.new(@output_[path]).dirname.to_s
+  @dest_[dir] = Pathname.new(@output_[path]).dirname.to_s
 end
 
 def cp_unchanged_to_output
   @modified_files.each_pair do |dir, modified_files|
     files_to_cp = Dir.entries(dir) - ['.', '..'] - modified_files
     files_to_cp.each do |file|
-      FileUtils.cp "#{dir}/#{file}", "#{@output_dir[dir]}/#{file}"
+      FileUtils.cp "#{dir}/#{file}", "#{@dest_[dir]}/#{file}"
     end
   end
 end

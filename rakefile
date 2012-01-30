@@ -5,20 +5,20 @@ task :default => ['spec:all']
 
 namespace :gem do
 
-  desc "Uninstall fc_config gem"
   task :uninstall do
     sh "gem uninstall -x fc_config"
   end
 
-  desc "Build fc_config gem"
   task :build do
     sh "gem build fc_config.gemspec"
   end
 
-  desc "Install fc_config gem"
   task :install do
     sh "gem install fc_config-0.0.1.gem"
   end
+
+  desc "Upgrade fc_config gem to the latest version"
+  task :upgrade => ['gem:build','gem:uninstall', 'gem:install']
 end
 
 namespace :spec do
