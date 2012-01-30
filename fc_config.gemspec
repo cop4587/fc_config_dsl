@@ -12,5 +12,5 @@ Gem::Specification.new do |spec|
   spec.executables = ["fc_config"]
   spec.default_executable = %q{fc_config}
 
-  spec.version = '0.0.1'
+  spec.version = '0.0.2'
 end

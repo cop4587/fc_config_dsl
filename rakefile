@@ -14,7 +14,7 @@ namespace :gem do
   end
 
   task :install do
-    sh "gem install fc_config-0.0.1.gem"
+    sh "gem install fc_config-0.0.2.gem"
   end
 
   desc "Upgrade fc_config gem to the latest version"
