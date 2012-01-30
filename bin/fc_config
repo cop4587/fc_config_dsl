@@ -16,7 +16,9 @@ YAML_FILE_EXT = 'des'
 
 @operations = {}
 @output_ = {}
-@modified_files = []
+
+@modified_files = Hash.new []
+@output_dir = {}
 
 def deploy(mod)
   raise "Unknown module - #{mod}. Current supports #{MODULES}" unless MODULES.include? mod
@@ -71,21 +73,20 @@ def dsl_for(path)
   end
 end
 
-class ModifiedFile
-  attr_reader :dir, :file
+def register_modified(path)
+  path_name = Pathname.new(path)
+  dir  = path_name.dirname.to_s
+  file = path_name.basename.to_s
+  @modified_files[dir] = @modified_files[dir] << file
 
-  def initialize(path)
-    path_name = Pathname.new(path)
-    @dir  = path_name.dirname.to_s
-    @file = path_name.basename.to_s
-  end
+  @output_dir[dir] = Pathname.new(@output_[path]).dirname.to_s
 end
 
 def cp_unchanged_to_output
-  @modified_files.each do |modified|
-    files_to_cp = Dir.entries(modified.dir) - ['.', '..', modified.file]
+  @modified_files.each_pair do |dir, modified_files|
+    files_to_cp = Dir.entries(dir) - ['.', '..'] - modified_files
     files_to_cp.each do |file|
-      FileUtils.cp "#{modified.dir}/#{file}", output_(file)
+      FileUtils.cp "#{dir}/#{file}", "#{@output_dir[dir]}/#{file}"
     end
   end
 end
@@ -101,7 +102,7 @@ load_platform_descriptor!
   end
 
   dsl.dump @output_[path]
-  @modified_files << ModifiedFile.new(path)
+  register_modified path
 end
 
 cp_unchanged_to_output
