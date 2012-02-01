@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 deploy :IMBS do
 
   config :data do
@@ -13,6 +15,7 @@ deploy :IMBS do
       add :entry_2 do
         _ :key_20 => 'add 20'
         _ :key_21 => 'add 21'
+        _ :key_21 => 'add 中文'
       end
     end
 
