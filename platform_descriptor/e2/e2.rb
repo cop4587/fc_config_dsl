@@ -17,5 +17,7 @@ deploy :IMBS do
       upd :key_2 => 'upd 2'
       add :key_4 => 'add 4'
     end
+
+    gflag
   end
 end

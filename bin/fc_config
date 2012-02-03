@@ -14,11 +14,10 @@ GROUPS  = [:ps, :ns]
 CONF_FILE_EXT = 'conf'
 YAML_FILE_EXT = 'des'
 
-@operations = {}
-@output_ = {}
-
+@operations = Hash.new
+@output_    = Hash.new
+@dest_      = Hash.new
 @modified_files = Hash.new []
-@dest_ = {}
 
 def deploy(mod)
   raise "Unknown module - #{mod}. Current supports #{MODULES}" unless MODULES.include? mod
@@ -78,7 +77,6 @@ def register_modified(path)
   dir  = path_name.dirname.to_s
   file = path_name.basename.to_s
   @modified_files[dir] = @modified_files[dir] << file
-
   @dest_[dir] = Pathname.new(@output_[path]).dirname.to_s
 end
 
