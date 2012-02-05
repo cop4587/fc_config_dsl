@@ -24,5 +24,10 @@ deploy :IMBS do
       add :new_flag_0 => 'yes'
       add :new_flag_1 => 'no'
     end
+
+    create :ns, 'imbs_conf_ns_1.gflags' do
+      add :create_flag_0 => 'yes'
+      add :create_flag_1 => 'no'
+    end
   end
 end

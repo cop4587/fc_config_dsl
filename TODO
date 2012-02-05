@@ -1,5 +1,8 @@
 COMMON
 
+. various error conditions handling
+  . only action 'add' is allowed in operation 'create'
+
 X fc_config works in production mode
 X mix conf and data (modify and creation)
 
@@ -8,9 +11,7 @@ X mix IMAS with IMBS - functional tested
 
 X build project with rake
 
-. various error conditions handling
-
-. copy no change files to output
+X copy no change files to output
   - only one group is allowed to be modified at one time,
     thus output contains that group's files only, so no group folder needed.
 
