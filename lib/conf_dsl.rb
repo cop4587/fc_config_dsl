@@ -29,8 +29,6 @@ module Deployment
       FileUtils.mkpath(dir) unless File.exist? dir
       File.open(path, 'w') { |f| Conf.dump(@content, f) }
     end
-
-
   end
 
   class Conf
