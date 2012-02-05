@@ -6,13 +6,15 @@ require "pathname"
 
 require_relative "../lib/yaml_dsl"
 require_relative "../lib/conf_dsl"
+require_relative "../lib/gflag_dsl"
 
 MODULES = [:IMBS, :IMAS, :QS]
 ITEMS   = [:conf, :data, :bin]
 GROUPS  = [:ps, :ns]
 
-CONF_FILE_EXT = 'conf'
-YAML_FILE_EXT = 'des'
+CONF_FILE_EXT  = 'conf'
+YAML_FILE_EXT  = 'des'
+GFLAG_FILE_EXT = 'gflags'
 
 @operations = Hash.new
 @output_    = Hash.new
@@ -69,6 +71,8 @@ def dsl_for(path)
       Deployment::YamlDSL.new
     when /\.#{CONF_FILE_EXT}$/
       Deployment::ConfDSL.new
+    when /\.#{GFLAG_FILE_EXT}$/
+      Deployment::GflagDSL.new
   end
 end
 

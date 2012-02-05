@@ -18,6 +18,11 @@ deploy :IMBS do
       add :key_4 => 'add 4'
     end
 
-    gflag
+    modify :ns, 'imbs_conf_ns_0.gflags' do
+      del :flag_0
+      upd :flag_1 => 'yes'
+      add :new_flag_0 => 'yes'
+      add :new_flag_1 => 'no'
+    end
   end
 end

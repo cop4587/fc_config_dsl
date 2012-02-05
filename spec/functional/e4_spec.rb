@@ -1,6 +1,7 @@
 require "yaml"
 
-describe "e4.rb: IMBS -> IMAS" do
+# Functional tests are executed by Rake for results checking ('then' of 'given-when-then') only
+describe "e4.rb: deploy IMBS then IMAS" do
 
   before(:all) do
     @output_root = 'output/e4'

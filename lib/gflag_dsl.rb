@@ -33,7 +33,7 @@ module Deployment
     def dump(path)
       dir = File.dirname path
       FileUtils.mkpath(dir) unless File.exist? dir
-      File.open(path, 'w') { |f| Conf.dump(@content, f) }
+      File.open(path, 'w') { |f| Gflag.dump(@content, f) }
     end
   end
 
