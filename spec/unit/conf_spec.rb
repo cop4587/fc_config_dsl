@@ -98,6 +98,39 @@ s1_k1 : s1 v1
       Deployment::Conf.dump(content, file)
       file.string.should == expected
     end
+
+    it "dumps sub-sub-sub sub sub-sub" do
+      content = {
+        'feature' => {
+          'sub_0' => {'s0_k0' => 's0 v0',
+            'sub_0_0' => {'s0_s0_k0' => 's0 s0 v0',
+              'sub_0_0_0' => {'s0_s0_s0_k0' => 's0 s0 s0 v0'}}},
+          'sub_1' => {'s1_k0' => 's1 v0', 's1_k1' => 's1 v1'},
+          'sub_2' => {'s2_k0' => 's2 v0',
+            'sub_2_0' => {'s2_s0_k0' => 's2 s0 v0'}}
+        }
+      }
+      file = StringIO.new
+      expected =<<-EOF
+[feature]
+[.sub_0]
+s0_k0 : s0 v0
+[..sub_0_0]
+s0_s0_k0 : s0 s0 v0
+[...sub_0_0_0]
+s0_s0_s0_k0 : s0 s0 s0 v0
+[.sub_1]
+s1_k0 : s1 v0
+s1_k1 : s1 v1
+[.sub_2]
+s2_k0 : s2 v0
+[..sub_2_0]
+s2_s0_k0 : s2 s0 v0
+      EOF
+
+      Deployment::Conf.dump(content, file)
+      file.string.should == expected
+    end
   end
 
   context "with sub-features as array" do
