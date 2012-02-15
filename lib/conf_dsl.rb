@@ -44,10 +44,29 @@ module Deployment
       result
     end
 
-    def self.dump(content, file)
-      content.each_pair do |key, value|
-        file.puts "#{key}#{SEPARATOR}#{value}"
+    def self.dump(content, file, level=0)
+      content.each_pair do |name, body|
+        if has_sub_feature? body
+          feature name, level, file
+          dump body, file, level+1
+        else
+          entry name, body, file
+        end
       end
+    end
+
+    private
+
+    def self.has_sub_feature?(body)
+      body.is_a? Hash
+    end
+
+    def self.feature(name, level, file)
+      file.puts "[#{'.'*level}#{name}]"
+    end
+
+    def self.entry(name, body, file)
+      file.puts "#{name}#{SEPARATOR}#{body}"
     end
   end
 end

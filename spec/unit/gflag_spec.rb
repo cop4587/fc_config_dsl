@@ -7,12 +7,12 @@ describe "Deployment::Gflag" do
     @content = ['flag_foo', 'noflag_bar', 'flag_buz']
   end
 
-  it "loads gflag file to array" do
+  it "loads" do
     file = StringIO.new %{--flag_foo\n--noflag_bar\n--flag_buz}
     Deployment::Gflag.load_file(file).should == @content
   end
 
-  it "dumps gflag hash to file" do
+  it "dumps" do
     file = StringIO.new
     expected =<<-EOF
 --flag_foo

@@ -14,7 +14,7 @@ GROUPS  = [:ps, :ns]
 
 CONF_FILE_EXT  = 'conf'
 YAML_FILE_EXT  = 'des'
-GFLAG_FILE_EXT = 'gflags'
+GFLAG_FILE_EXT = 'gflags'  # TODO unify extensions used in AS-BS
 
 @operations = Hash.new
 @output_    = Hash.new
