@@ -158,6 +158,70 @@ lib : kkk
       Deployment::Conf.dump(content, file)
       file.string.should == expected
     end
+
+    it "dumps @sub-sub @sub" do
+      content = {
+        'feature' => {
+          'sub' => [
+            { 0 => {'host' => 'foo', 'lib' => 'vvv', 'sub_0_0' => {'s0_s0_k0' => 's0 s0 v0', 's0_s0_k1' => 's0 s0 v1'}}},
+            { 1 => {'host' => 'bar', 'lib' => 'kkk'}}
+          ]
+        }
+      }
+      file = StringIO.new
+      expected =<<-EOF
+[feature]
+[.@sub]
+host : foo
+lib : vvv
+[..sub_0_0]
+s0_s0_k0 : s0 s0 v0
+s0_s0_k1 : s0 s0 v1
+[.@sub]
+host : bar
+lib : kkk
+      EOF
+
+      Deployment::Conf.dump(content, file)
+      file.string.should == expected
+    end
+
+    it "dumps @sub-sub @sub @lib @lib" do
+      content = {
+        'feature' => {
+          'sub' => [
+            { 0 => {'host' => 'foo', 'lib' => 'vvv', 'sub_0_0' => {'s0_s0_k0' => 's0 s0 v0', 's0_s0_k1' => 's0 s0 v1'}}},
+            { 1 => {'host' => 'bar', 'lib' => 'kkk'}}
+          ],
+          'lib' => [
+            { 0 => {'l_k_0' => 'foo', 'l_k_1' => 'buz'}},
+            { 1 => {'l_k_0' => 'bar', 'a_key' => 'a val'}}
+          ]
+        }
+      }
+      file = StringIO.new
+      expected =<<-EOF
+[feature]
+[.@sub]
+host : foo
+lib : vvv
+[..sub_0_0]
+s0_s0_k0 : s0 s0 v0
+s0_s0_k1 : s0 s0 v1
+[.@sub]
+host : bar
+lib : kkk
+[.@lib]
+l_k_0 : foo
+l_k_1 : buz
+[.@lib]
+l_k_0 : bar
+a_key : a val
+      EOF
+
+      Deployment::Conf.dump(content, file)
+      file.string.should == expected
+    end
   end
 
 end

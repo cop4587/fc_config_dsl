@@ -53,9 +53,7 @@ module Deployment
           body.each do |at_sub|
             at_sub.each_pair do |index, entries|
               array name, level, file
-              entries.each_pair do |key, val|
-                entry key, val, file
-              end
+              dump entries, level+1, file
             end
           end
         else
