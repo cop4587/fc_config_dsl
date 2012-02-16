@@ -44,11 +44,20 @@ module Deployment
       result
     end
 
-    def self.dump(content, file, level=0)
+    def self.dump(content, level=0, file)
       content.each_pair do |name, body|
         if has_sub_feature? body
           feature name, level, file
-          dump body, file, level+1
+          dump body, level+1, file
+        elsif has_sub_array? body
+          body.each do |at_sub|
+            at_sub.each_pair do |index, entries|
+              array name, level, file
+              entries.each_pair do |key, val|
+                entry key, val, file
+              end
+            end
+          end
         else
           entry name, body, file
         end
@@ -61,8 +70,16 @@ module Deployment
       body.is_a? Hash
     end
 
+    def self.has_sub_array?(body)
+      body.is_a? Array
+    end
+
     def self.feature(name, level, file)
       file.puts "[#{'.'*level}#{name}]"
+    end
+
+    def self.array(name, level, file)
+      file.puts "[#{'.'*level}@#{name}]"
     end
 
     def self.entry(name, body, file)

@@ -27,7 +27,7 @@ key_2 : 2
     end
   end
 
-  context "with sub-features" do
+  context "with sub(s)" do
 
     it "loads"
 
@@ -133,8 +133,31 @@ s2_s0_k0 : s2 s0 v0
     end
   end
 
-  context "with sub-features as array" do
+  context "with @sub(s)" do
 
+    it "dumps @sub @sub" do
+      content = {
+        'feature' => {
+          'sub' => [
+            { 0 => {'host' => 'foo', 'lib' => 'vvv'}},
+            { 1 => {'host' => 'bar', 'lib' => 'kkk'}}
+          ]
+        }
+      }
+      file = StringIO.new
+      expected =<<-EOF
+[feature]
+[.@sub]
+host : foo
+lib : vvv
+[.@sub]
+host : bar
+lib : kkk
+      EOF
+
+      Deployment::Conf.dump(content, file)
+      file.string.should == expected
+    end
   end
 
 end
