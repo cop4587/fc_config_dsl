@@ -222,6 +222,41 @@ a_key : a val
       Deployment::Conf.dump(content, file)
       file.string.should == expected
     end
+
+    it "dumps sub-sub-@lib @lib sub" do
+      content = {
+        'feature' => {
+          'sub_0' => {'key_0' => 'val 0', 'sub_sub' => {
+            'key_00' => 'val 00',
+            'lib' => [
+                {0 => {'s0_s0_k0' => 's0 s0 v0 foo', 's0_s0_k1' => 's0 s0 v1 foo'}},
+                {1 => {'s0_s0_k0' => 's0 s0 v0 bar', 's0_s0_k1' => 's0 s0 v1 bar'}},
+            ]}
+          },
+          'sub_1' => {'key_1' => 'val 1', 'key_2' => 'val 2'}
+        }
+      }
+      file = StringIO.new
+      expected =<<-EOF
+[feature]
+[.sub_0]
+key_0 : val 0
+[..sub_sub]
+key_00 : val 00
+[...@lib]
+s0_s0_k0 : s0 s0 v0 foo
+s0_s0_k1 : s0 s0 v1 foo
+[...@lib]
+s0_s0_k0 : s0 s0 v0 bar
+s0_s0_k1 : s0 s0 v1 bar
+[.sub_1]
+key_1 : val 1
+key_2 : val 2
+      EOF
+
+      Deployment::Conf.dump(content, file)
+      file.string.should == expected
+    end
   end
 
 end
