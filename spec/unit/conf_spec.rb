@@ -29,43 +29,136 @@ key_2 : 2
 
   context "with sub(s)" do
 
-    it "loads"
+    describe "loads" do
 
-    it "dumps sub" do
-      content = { 'feature' => { 'sub' => {'key_0' => 'val 0', 'key_1' => 'val 1'}}}
-      file = StringIO.new
-      expected =<<-EOF
+      it "feature" do
+        content =<<-EOF
+[feature]
+key_0 : val 0
+key_1 : val 1
+        EOF
+        file = StringIO.new content
+        expected = { 'feature' => {'key_0' => 'val 0', 'key_1' => 'val 1'}}
+
+        loaded = Deployment::Conf.load_file(file)
+        loaded.should == expected
+      end
+
+      it "sub" do
+        content =<<-EOF
 [feature]
 [.sub]
 key_0 : val 0
 key_1 : val 1
-      EOF
+        EOF
+        file = StringIO.new content
+        expected = { 'feature' => { 'sub' => {'key_0' => 'val 0', 'key_1' => 'val 1'}}}
 
-      Deployment::Conf.dump(content, file)
-      file.string.should == expected
-    end
+        loaded = Deployment::Conf.load_file(file)
+        loaded.should == expected
+      end
 
-    it "dumps sub-sub" do
-      content = { 'feature' => { 'sub' => {'key_0' => 'val 0', 'sub_sub' => {'key_00' => 'val 00'}}}}
-      file = StringIO.new
-      expected =<<-EOF
+      it "sub-sub" do
+        content =<<-EOF
+[feature]
+[.sub]
+key_0 : val 0
+key_1 : val 1
+[..sub_sub]
+key_00 : val 00
+key_01 : val 01
+        EOF
+        file = StringIO.new content
+        expected = { 'feature' => { 'sub' => {'key_0' => 'val 0', 'key_1' => 'val 1',
+                                              'sub_sub' => {'key_00' => 'val 00', 'key_01' => 'val 01'}}}}
+
+        loaded = Deployment::Conf.load_file(file)
+        loaded.should == expected
+      end
+
+      it "sub-sub-sub" do
+        content =<<-EOF
+[feature]
+[.sub]
+key_0 : val 0
+key_1 : val 1
+[..sub_sub]
+key_00 : val 00
+key_01 : val 01
+[...sub_sub_sub]
+key_000 : val 000
+key_001 : val 001
+        EOF
+        file = StringIO.new content
+        expected = { 'feature' => { 'sub' => {'key_0' => 'val 0', 'key_1' => 'val 1',
+                                              'sub_sub' => {'key_00' => 'val 00',
+                                                            'key_01' => 'val 01',
+                                                            'sub_sub_sub' => {'key_000' => 'val 000',
+                                                                              'key_001' => 'val 001'}}}}}
+
+        loaded = Deployment::Conf.load_file(file)
+        loaded.should == expected
+      end
+
+      it "sub-sub sub" do
+        content =<<-EOF
+[feature]
+[.sub_0]
+s0k0 : s0v0
+s0k1 : s0v1
+[..sub_sub]
+key_00 : val 00
+key_01 : val 01
+[.sub_1]
+s1k0 : s1v0
+s1k1 : s1v1
+        EOF
+        file = StringIO.new content
+        expected = { 'feature' => { 'sub_0' => {'s0k0' => 's0v0', 's0k1' => 's0v1',
+                                                'sub_sub' => {'key_00' => 'val 00', 'key_01' => 'val 01'}},
+                                    'sub_1' => {'s1k0' => 's1v0', 's1k1' => 's1v1'}}}
+
+        loaded = Deployment::Conf.load_file(file)
+        loaded.should == expected
+      end
+    end # describe loads
+
+    describe "dumps" do
+      it "sub" do
+        content = { 'feature' => { 'sub' => {'key_0' => 'val 0', 'key_1' => 'val 1'}}}
+        file = StringIO.new
+        expected =<<-EOF
+[feature]
+[.sub]
+key_0 : val 0
+key_1 : val 1
+        EOF
+
+        Deployment::Conf.dump(content, file)
+        file.string.should == expected
+      end
+
+      it "sub-sub" do
+        content = { 'feature' => { 'sub' => {'key_0' => 'val 0', 'sub_sub' => {'key_00' => 'val 00'}}}}
+        file = StringIO.new
+        expected =<<-EOF
 [feature]
 [.sub]
 key_0 : val 0
 [..sub_sub]
 key_00 : val 00
-      EOF
+        EOF
 
-      Deployment::Conf.dump(content, file)
-      file.string.should == expected
-    end
+        Deployment::Conf.dump(content, file)
+        file.string.should == expected
+      end
 
-    it "dumps sub sub" do
-      content = { 'feature' => {
-        'sub_0' => {'s0_k0' => 's0 v0', 's0_k1' => 's0 v1'},
-        'sub_1' => {'s1_k0' => 's1 v0', 's1_k1' => 's1 v1'}}}
-      file = StringIO.new
-      expected =<<-EOF
+      it "dumps sub sub" do
+        content = { 'feature' => {
+          'sub_0' => {'s0_k0' => 's0 v0', 's0_k1' => 's0 v1'},
+          'sub_1' => {'s1_k0' => 's1 v0', 's1_k1' => 's1 v1'}}}
+        file = StringIO.new
+        expected =<<-EOF
 [feature]
 [.sub_0]
 s0_k0 : s0 v0
@@ -73,18 +166,18 @@ s0_k1 : s0 v1
 [.sub_1]
 s1_k0 : s1 v0
 s1_k1 : s1 v1
-      EOF
+        EOF
 
-      Deployment::Conf.dump(content, file)
-      file.string.should == expected
-    end
+        Deployment::Conf.dump(content, file)
+        file.string.should == expected
+      end
 
-    it "dumps sub-sub sub" do
-      content = { 'feature' => {
-        'sub_0' => {'s0_k0' => 's0 v0', 'sub_0_0' => {'s0_s0_k0' => 's0 s0 v0'}},
-        'sub_1' => {'s1_k0' => 's1 v0', 's1_k1' => 's1 v1'}}}
-      file = StringIO.new
-      expected =<<-EOF
+      it "sub-sub sub" do
+        content = { 'feature' => {
+          'sub_0' => {'s0_k0' => 's0 v0', 'sub_0_0' => {'s0_s0_k0' => 's0 s0 v0'}},
+          'sub_1' => {'s1_k0' => 's1 v0', 's1_k1' => 's1 v1'}}}
+        file = StringIO.new
+        expected =<<-EOF
 [feature]
 [.sub_0]
 s0_k0 : s0 v0
@@ -93,25 +186,25 @@ s0_s0_k0 : s0 s0 v0
 [.sub_1]
 s1_k0 : s1 v0
 s1_k1 : s1 v1
-      EOF
+        EOF
 
-      Deployment::Conf.dump(content, file)
-      file.string.should == expected
-    end
+        Deployment::Conf.dump(content, file)
+        file.string.should == expected
+      end
 
-    it "dumps sub-sub-sub sub sub-sub" do
-      content = {
-        'feature' => {
-          'sub_0' => {'s0_k0' => 's0 v0',
-            'sub_0_0' => {'s0_s0_k0' => 's0 s0 v0',
-              'sub_0_0_0' => {'s0_s0_s0_k0' => 's0 s0 s0 v0'}}},
-          'sub_1' => {'s1_k0' => 's1 v0', 's1_k1' => 's1 v1'},
-          'sub_2' => {'s2_k0' => 's2 v0',
-            'sub_2_0' => {'s2_s0_k0' => 's2 s0 v0'}}
+      it "sub-sub-sub sub sub-sub" do
+        content = {
+          'feature' => {
+            'sub_0' => {'s0_k0' => 's0 v0',
+              'sub_0_0' => {'s0_s0_k0' => 's0 s0 v0',
+                'sub_0_0_0' => {'s0_s0_s0_k0' => 's0 s0 s0 v0'}}},
+            'sub_1' => {'s1_k0' => 's1 v0', 's1_k1' => 's1 v1'},
+            'sub_2' => {'s2_k0' => 's2 v0',
+              'sub_2_0' => {'s2_s0_k0' => 's2 s0 v0'}}
+          }
         }
-      }
-      file = StringIO.new
-      expected =<<-EOF
+        file = StringIO.new
+        expected =<<-EOF
 [feature]
 [.sub_0]
 s0_k0 : s0 v0
@@ -126,12 +219,15 @@ s1_k1 : s1 v1
 s2_k0 : s2 v0
 [..sub_2_0]
 s2_s0_k0 : s2 s0 v0
-      EOF
+        EOF
 
-      Deployment::Conf.dump(content, file)
-      file.string.should == expected
+        Deployment::Conf.dump(content, file)
+        file.string.should == expected
+      end
     end
-  end
+
+
+  end # context - with sub(s)
 
   context "with @sub(s)" do
 

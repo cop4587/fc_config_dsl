@@ -36,12 +36,35 @@ module Deployment
     SEPARATOR  = ' : '
 
     def self.load_file(file)
-      result = {}
-      file.each_line do |line|
-        key, value = line.strip.split SEPARATOR
-        result[key] = value
-      end
-      result
+      lines = file.readlines
+      content = {}
+      load_lines(lines, content)
+      content
+    end
+
+    def self.load_lines(lines, content)
+      feature?(lines[0])? load_feature(lines, content) : load_entry(lines, content) unless lines.empty?
+    end
+
+    def self.load_feature(lines, content)
+      feature = {}
+      content[key_of_(lines[0].strip)] = feature
+      load_lines(lines[1..-1], feature)
+    end
+
+    def self.load_entry(lines, content)
+      key, value = lines[0].strip.split SEPARATOR
+      content[key] = value
+      load_lines(lines[1..-1], content)
+    end
+
+    def self.feature?(line)
+      line.start_with? '['
+    end
+
+    def self.key_of_(line)
+      prefix = line.scan /^(\[\.*)/
+      line[prefix[0][0].size..-2]
     end
 
     def self.dump(content, level=0, file)
