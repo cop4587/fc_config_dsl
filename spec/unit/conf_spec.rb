@@ -76,6 +76,24 @@ key_01 : val 01
         loaded.should == expected
       end
 
+      it "sub sub" do
+        content =<<-EOF
+[feature]
+[.sub]
+key_0 : val 0
+key_1 : val 1
+[.tub]
+tey_0 : tal 0
+tey_1 : tal 1
+        EOF
+        file = StringIO.new content
+        expected = { 'feature' => { 'sub' => {'key_0' => 'val 0', 'key_1' => 'val 1'},
+                                    'tub' => {'tey_0' => 'tal 0', 'tey_1' => 'tal 1'}}}
+
+        loaded = Deployment::Conf.load_file(file)
+        loaded.should == expected
+      end
+
       it "sub-sub-sub" do
         content =<<-EOF
 [feature]
@@ -114,9 +132,34 @@ s1k0 : s1v0
 s1k1 : s1v1
         EOF
         file = StringIO.new content
-        expected = { 'feature' => { 'sub_0' => {'s0k0' => 's0v0', 's0k1' => 's0v1',
-                                                'sub_sub' => {'key_00' => 'val 00', 'key_01' => 'val 01'}},
-                                    'sub_1' => {'s1k0' => 's1v0', 's1k1' => 's1v1'}}}
+        expected = {'feature' => {'sub_0' => {'s0k0' => 's0v0', 's0k1' => 's0v1',
+                                    'sub_sub' => {'key_00' => 'val 00', 'key_01' => 'val 01'}},
+                                  'sub_1' => {'s1k0' => 's1v0', 's1k1' => 's1v1'}}}
+
+        loaded = Deployment::Conf.load_file(file)
+        loaded.should == expected
+      end
+
+      it "k:v sub-sub sub" do
+        content =<<-EOF
+key : val
+[feature]
+[.sub_0]
+s0k0 : s0v0
+s0k1 : s0v1
+[..sub_sub]
+key_00 : val 00
+key_01 : val 01
+[.sub_1]
+s1k0 : s1v0
+s1k1 : s1v1
+        EOF
+        file = StringIO.new content
+        expected = {
+            'key' => 'val',
+            'feature' => {'sub_0' => {'s0k0' => 's0v0', 's0k1' => 's0v1',
+                                      'sub_sub' => {'key_00' => 'val 00', 'key_01' => 'val 01'}},
+                          'sub_1' => {'s1k0' => 's1v0', 's1k1' => 's1v1'}}}
 
         loaded = Deployment::Conf.load_file(file)
         loaded.should == expected

@@ -38,31 +38,38 @@ module Deployment
     def self.load_file(file)
       lines = file.readlines
       content = {}
-      load_lines(lines, content)
+      load_lines(lines, content, content)
       content
     end
 
-    def self.load_lines(lines, content)
-      feature?(lines[0])? load_feature(lines, content) : load_entry(lines, content) unless lines.empty?
+    def self.load_lines(lines, root_hash, current_hash)
+      lines[0].start_with?('[')?
+          load_feature(lines, root_hash) : load_entry(lines, root_hash, current_hash) unless lines.empty?
     end
 
-    def self.load_feature(lines, content)
-      feature = {}
-      content[key_of_(lines[0].strip)] = feature
-      load_lines(lines[1..-1], feature)
+    def self.load_feature(lines, root_hash)
+      line = lines[0].strip
+      nesting_levels = line.scan(/^(\[\.*)/)[0][0].size - 1  # '[' = 0, '[.' = 1, '[..' = 2
+      current_hash = {}
+      hash_at(nesting_levels, root_hash)[key_of line] = current_hash
+      load_lines(lines[1..-1], root_hash, current_hash)
     end
 
-    def self.load_entry(lines, content)
+    def self.hash_at(nesting_levels, root_hash)
+      return root_hash if nesting_levels == 0
+      return root_hash.values[-1] if nesting_levels == 1
+
+      hash_nested = "values[-1]" + (".values[-1]" * (nesting_levels - 1))
+      root_hash.instance_eval hash_nested
+    end
+
+    def self.load_entry(lines, root_hash, current_hash)
       key, value = lines[0].strip.split SEPARATOR
-      content[key] = value
-      load_lines(lines[1..-1], content)
+      current_hash[key] = value
+      load_lines(lines[1..-1], root_hash, current_hash)
     end
 
-    def self.feature?(line)
-      line.start_with? '['
-    end
-
-    def self.key_of_(line)
+    def self.key_of(line)
       prefix = line.scan /^(\[\.*)/
       line[prefix[0][0].size..-2]
     end
