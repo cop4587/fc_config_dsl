@@ -1,5 +1,7 @@
-$:<<"../lib/"
+$:<<"../lib"
 
-require "yaml_dsl"
-require "conf_dsl"
-require "gflag_dsl"
+require "dsl/yaml_dsl"
+require "dsl/conf_dsl"
+require "dsl/gflag_dsl"
+require "util/hash_util"
+

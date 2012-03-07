@@ -1,10 +1,21 @@
-require_relative 'dsl'
+require_relative '../util/hash_util'
 
 module Deployment
 
-  class ConfDSL < DSL
+  class ConfDSL
+    include HashUtil
+
+    attr_accessor :content
+
+    #def initialize
+    #  @content
+    #end
 
     def add(entry)
+      #if block_given?
+      #
+      #end
+
       @content.merge! stringify(entry)
     end
 
@@ -51,7 +62,14 @@ module Deployment
       line = lines[0].strip
       nesting_levels = line.scan(/^(\[\.*)/)[0][0].size - 1  # '[' = 0, '[.' = 1, '[..' = 2
       current_hash = {}
-      hash_at(nesting_levels, root_hash)[key_of line] = current_hash
+
+      key_of_line = key_of line
+      if key_of_line.start_with?('@')
+
+      end
+
+
+      hash_at(nesting_levels, root_hash)[key_of_line] = current_hash
       load_lines(lines[1..-1], root_hash, current_hash)
     end
 
@@ -74,16 +92,16 @@ module Deployment
       line[prefix[0][0].size..-2]
     end
 
-    def self.dump(content, level=0, file)
+    def self.dump(content, file, level=0)
       content.each_pair do |name, body|
         if has_sub_feature? body
           feature name, level, file
-          dump body, level+1, file
+          dump body, file, level+1
         elsif has_sub_array? body
           body.each do |at_sub|
             at_sub.each_pair do |index, entries|
               array name, level, file
-              dump entries, level+1, file
+              dump entries, file, level+1
             end
           end
         else

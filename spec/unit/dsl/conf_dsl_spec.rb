@@ -1,12 +1,13 @@
 require "spec_helper"
 
-describe "Deployment::ConfDSL" do
+describe "ConfDSL" do
 
   before(:all) do
     @dsl = Deployment::ConfDSL.new
   end
 
-  describe "add" do
+  describe ".add" do
+    
     it "one entry" do
       @dsl.content = {}
       platform_descriptor =<<-END
@@ -31,7 +32,7 @@ describe "Deployment::ConfDSL" do
     end
 
     it "sub" do
-      pending
+      pending 'WIP'
       @dsl.content = {}
       platform_descriptor =<<-END
         add :feature do
@@ -41,7 +42,7 @@ describe "Deployment::ConfDSL" do
           end
         end
       END
-    expected = { 'feature' => { 'sub' => {'key_0' => 'val 0', 'key_1' => 'val 1'} }}
+      expected = { 'feature' => { 'sub' => {'key_0' => 'val 0', 'key_1' => 'val 1'} }}
 
       @dsl.instance_eval platform_descriptor
       @dsl.content.should == expected
@@ -49,7 +50,7 @@ describe "Deployment::ConfDSL" do
 
 
     it "sub sub" do
-      pending
+      pending 'TODO'
       @dsl.content = {}
       platform_descriptor =<<-END
         add :feature do
@@ -76,7 +77,7 @@ describe "Deployment::ConfDSL" do
     end
     
     it "sub-sub sub" do
-      pending
+      pending 'TODO'
       @dsl.content = {}
       platform_descriptor =<<-END
         add :feature do
@@ -111,7 +112,7 @@ describe "Deployment::ConfDSL" do
     end
 
     it "@sub @sub" do
-      pending
+      pending 'TODO'
       @dsl.content = {}
       platform_descriptor =<<-END
         add :feature do
@@ -155,9 +156,9 @@ describe "Deployment::ConfDSL" do
       @dsl.instance_eval platform_descriptor
       @dsl.content.should == expected
     end
-  end
+  end  # describe - add
 
-  describe "upd" do
+  describe ".upd" do
 
     it "one entry" do
       @dsl.content = { 'key_0' => 'val 0', 'key_1' => 'val 1' }
@@ -181,9 +182,9 @@ describe "Deployment::ConfDSL" do
       @dsl.instance_eval platform_descriptor
       @dsl.content.should == expected
     end
-  end
+  end  # describe - upd
 
-  describe "del" do
+  describe ".del" do
     it "one entry" do
       @dsl.content = { 'key_0' => 'val 0', 'key_1' => 'val 1' }
       platform_descriptor =<<-END
@@ -206,5 +207,5 @@ describe "Deployment::ConfDSL" do
       @dsl.instance_eval platform_descriptor
       @dsl.content.should == expected
     end
-  end
+  end  # describe - del
 end

@@ -1,12 +1,12 @@
 require "spec_helper"
 
-describe "Deployment::GflagDSL" do
+describe "GflagDSL" do
 
   before(:all) do
     @dsl = Deployment::GflagDSL.new
   end
 
-  describe "add" do
+  describe ".add" do
     it "one entry" do
       @dsl.content = []
       platform_descriptor =<<-END
@@ -31,7 +31,7 @@ describe "Deployment::GflagDSL" do
     end
   end
 
-  describe "upd" do
+  describe ".upd" do
 
     it "raises exception if gflag not found" do
       @dsl.content = ['flag_foo']
@@ -68,7 +68,7 @@ describe "Deployment::GflagDSL" do
     end
   end
 
-  describe "del" do
+  describe ".del" do
 
     it "raises exception if gflag not found" do
       @dsl.content = ['flag_foo']

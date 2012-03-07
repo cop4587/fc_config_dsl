@@ -1,12 +1,12 @@
 require "spec_helper"
 
-describe "Deployment::YamlDSL" do
+describe "YamlDSL" do
 
   before(:each) do
     @dsl = Deployment::YamlDSL.new
   end
 
-  describe "add" do
+  describe ".add" do
 
     context "one entry" do
 
@@ -81,7 +81,7 @@ describe "Deployment::YamlDSL" do
     end
   end # add
 
-  describe "upd" do
+  describe ".upd" do
 
     context "one entry" do
 
@@ -157,7 +157,7 @@ describe "Deployment::YamlDSL" do
     end
   end # upd
 
-  describe "del" do
+  describe ".del" do
 
     it "one entry" do
       @dsl.content = { 'entry_0' => { 'key_0' => '00', 'key_1' => '01' },

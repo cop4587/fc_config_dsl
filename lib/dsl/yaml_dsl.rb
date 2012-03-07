@@ -1,8 +1,11 @@
-require_relative 'dsl'
+require_relative '../util/hash_util'
 
 module Deployment
 
-  class YamlDSL < DSL
+  class YamlDSL
+    include HashUtil
+
+    attr_accessor :content
 
     def initialize
       @elements = {}

@@ -1,8 +1,8 @@
-require_relative 'dsl'
-
 module Deployment
 
-  class GflagDSL < DSL
+  class GflagDSL
+
+    attr_accessor :content
 
     def add(entry)
       case entry.values[0].to_s
