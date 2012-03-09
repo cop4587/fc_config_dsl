@@ -1,5 +1,7 @@
 module Deployment
+
   module HashUtil
+
     def stringify(hash)
       result = {}
       hash.each_pair do |k,v|

@@ -32,7 +32,6 @@ describe "ConfDSL" do
     end
 
     it "sub" do
-      pending 'WIP'
       @dsl.content = {}
       platform_descriptor =<<-END
         add :feature do

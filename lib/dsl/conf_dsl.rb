@@ -5,34 +5,60 @@ module Deployment
   class ConfDSL
     include HashUtil
 
-    attr_accessor :content
+    def initialize
+      @stack = []
+      @stack.push Hash.new
+    end
 
-    #def initialize
-    #  @content
-    #end
+    def content
+      @stack.first
+    end
 
-    def add(entry)
-      #if block_given?
-      #
-      #end
+    def content=(given)
+      @stack.first.clear
+      @stack.first.merge!(given)
+    end
 
-      @content.merge! stringify(entry)
+    def add(entry, &block)
+      if block.nil?
+        @stack.last.merge! stringify(entry)
+      else
+        hash = {}
+        @stack.last[entry.to_s] = hash
+        @stack.push hash
+        block.call
+      end
+    end
+
+    def _(entry, &block)
+      if block.nil?
+        @stack.last.merge! stringify(entry)
+      else
+        hash = {}
+        @stack.last[entry.to_s] = hash
+        @stack.push hash
+        block.call
+        @stack.pop
+      end
     end
 
     def upd(entry)
       key = entry.keys[0].to_s
-      raise "Entry to upd not found - #{key}" unless @content[key]
-      @content[key] = entry.values[0].to_s
+      raise "Entry to upd not found - #{key}" unless content[key]
+      #@content[key] = entry.values[0].to_s
+
+      @stack.first[key] = entry.values[0].to_s
     end
 
     def del(key)
       key_s = key.to_s
-      raise "Entry to del not found - #{key_s}" unless @content[key_s]
-      @content.delete key_s
+      raise "Entry to del not found - #{key_s}" unless content[key_s]
+      #@content.delete key_s
+      @stack.first.delete key_s
     end
 
     def load(file)
-      @content = File.exist?(file) ? Conf.load_file(File.open file) : {}
+      content = File.exist?(file) ? Conf.load_file(File.open file) : {}
     end
 
     def dump(path)
