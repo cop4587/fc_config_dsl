@@ -10,8 +10,8 @@ describe "HashUtil" do
     hash[:key_1] = :val_1
     hash[:key_2] = :val_2
 
-    stringified = stringify hash
+    result = stringify hash
 
-    stringified.should == {'key_0' => 'val_0', 'key_1' => 'val_1', 'key_2' => 'val_2'}
+    result.should == {'key_0' => 'val_0', 'key_1' => 'val_1', 'key_2' => 'val_2'}
   end
 end

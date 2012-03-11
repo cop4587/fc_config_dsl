@@ -4,9 +4,9 @@ require "yaml"
 require "fileutils"
 require "pathname"
 
-require_relative "../lib/yaml_dsl"
-require_relative "../lib/conf_dsl"
-require_relative "../lib/gflag_dsl"
+require_relative "../lib/dsl/yaml_dsl"
+require_relative "../lib/dsl/conf_dsl"
+require_relative "../lib/dsl/gflag_dsl"
 
 MODULES = [:IMBS, :IMAS, :QS]
 ITEMS   = [:conf, :data, :bin]

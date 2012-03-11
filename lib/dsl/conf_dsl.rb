@@ -23,9 +23,9 @@ module Deployment
       if block.nil?
         @stack.last.merge! stringify(entry)
       else
-        hash = {}
-        @stack.last[entry.to_s] = hash
-        @stack.push hash
+        feature = {}
+        @stack.last[entry.to_s] = feature
+        @stack.push feature
         block.call
       end
     end
@@ -34,9 +34,9 @@ module Deployment
       if block.nil?
         @stack.last.merge! stringify(entry)
       else
-        hash = {}
-        @stack.last[entry.to_s] = hash
-        @stack.push hash
+        sub = {}
+        @stack.last[entry.to_s] = sub
+        @stack.push sub
         block.call
         @stack.pop
       end
@@ -45,7 +45,6 @@ module Deployment
     def upd(entry)
       key = entry.keys[0].to_s
       raise "Entry to upd not found - #{key}" unless content[key]
-      #@content[key] = entry.values[0].to_s
 
       @stack.first[key] = entry.values[0].to_s
     end
@@ -53,7 +52,6 @@ module Deployment
     def del(key)
       key_s = key.to_s
       raise "Entry to del not found - #{key_s}" unless content[key_s]
-      #@content.delete key_s
       @stack.first.delete key_s
     end
 
@@ -64,7 +62,7 @@ module Deployment
     def dump(path)
       dir = File.dirname path
       FileUtils.mkpath(dir) unless File.exist? dir
-      File.open(path, 'w') { |f| Conf.dump(@content, f) }
+      File.open(path, 'w') { |f| Conf.dump(content, f) }
     end
   end
 
