@@ -399,9 +399,43 @@ describe "ConfDSL" do
     end  # context - sub
 
     context "@sub" do
-      it "@sub @sub"
 
-      it "@sub @sub @tub @tub"
+      it "@sub @sub" do
+        @dsl.content = {
+          'feature' => {
+            'sub' => {
+              '0' => {'host' => 'host 0', 'lib' => 'foo'},
+              '1' => {'host' => 'host 1', 'lib' => 'bar'}
+            }
+          }
+        }
+
+        platform_descriptor =<<-END
+          upd :feature do
+            _ :sub do
+              _ 0 do
+                _ :host => 'updated host 0'
+                _ :lib  => 'lib 0'
+              end
+              _ 1 do
+                _ :host => 'host 1'
+                _ :lib  => 'updated lib 1'
+              end
+            end
+          end
+        END
+        expected = {
+          'feature' => {
+            'sub' => {
+              '0' => {'host' => 'updated host 0', 'lib' => 'lib 0'},
+              '1' => {'host' => 'host 1', 'lib' => 'updated lib 1'}
+            }
+          }
+        }
+
+        @dsl.instance_eval platform_descriptor
+        @dsl.content.should == expected
+      end
     end  # context - @sub
   end  # describe - upd
 
