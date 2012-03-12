@@ -289,8 +289,7 @@ describe "ConfDSL" do
 
       it "raises error on unknown entry"
 
-      it "sub" do
-        pending 'WIP'
+      it "feature-sub" do
         @dsl.content = {
           'feature' => {
              'sub_0' => {'key_0' => 'val 0', 'key_1' => 'val 1'}
@@ -313,7 +312,33 @@ describe "ConfDSL" do
         @dsl.content.should == expected
       end
 
-      it "sub sub"
+      it "feature-{sub sub}" do
+        @dsl.content = {
+          'feature' => {
+             'sub_0' => {'key_00' => 'val 00', 'key_01' => 'val 01'},
+             'sub_1' => {'key_10' => 'val 10', 'key_11' => 'val 11'}
+          }
+        }
+        platform_descriptor =<<-END
+          upd :feature do
+            _ :sub_0 do
+              _ :key_00 => 'upd 00'
+            end
+            _ :sub_1 do
+              _ :key_11 => 'upd 11'
+            end
+          end
+        END
+        expected = {
+          'feature' => {
+             'sub_0' => {'key_00' => 'upd 00', 'key_01' => 'val 01'},
+             'sub_1' => {'key_10' => 'val 10', 'key_11' => 'upd 11'}
+          }
+        }
+
+        @dsl.instance_eval platform_descriptor
+        @dsl.content.should == expected
+      end
 
       it "sub-sub sub"
 

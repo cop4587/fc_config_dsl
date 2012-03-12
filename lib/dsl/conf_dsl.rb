@@ -2,14 +2,25 @@ require_relative '../util/hash_util'
 
 module Deployment
 
+  module AddDSL
+    def _(entry, &block)
+      add_sub entry, block
+    end
+  end
+
+  module UpdDSL
+    def _(entry, &block)
+      upd_sub entry, block
+    end
+  end
+
   class ConfDSL
     include HashUtil
 
     def initialize
       @stack = []
       @stack.push Hash.new
-
-      @keys = []
+      @current = content
     end
 
     def content
@@ -17,32 +28,21 @@ module Deployment
     end
 
     def content=(given)
-      @stack.first.clear
-      @stack.first.merge!(given)
+      content.clear
+      content.merge! given
     end
 
     def add(entry, &block)
-      return @stack.last.merge!(stringify(entry)) if block.nil?
-      push_hash_to_stack(entry, block)
-      @stack.pop
-    end
-
-    def _(entry, &block)
-      return @stack.last.merge! stringify(entry) if block.nil?
-      push_hash_to_stack(entry, block)
-      @stack.pop
+      extend AddDSL
+      add_sub entry, block
     end
 
     def upd(entry, &block)
-      key = entry.keys[0].to_s
-      raise "Entry to upd not found - #{key}" unless content[key]
-
-      return @stack.last[key] = entry.values[0].to_s if block.nil?
-
-      @keys.clear
-      @keys.push entry
-      block.call
+      extend UpdDSL
+      upd_sub entry, block
     end
+
+
 
     def del(key)
       key_s = key.to_s
@@ -62,10 +62,18 @@ module Deployment
 
     private
 
-    def push_hash_to_stack(entry, block)
+    def add_sub(entry, block)
+      return @stack.last.merge!(stringify(entry)) if block.nil?
       hash = {}
       @stack.last[entry.to_s] = hash
       @stack.push hash
+      block.call
+      @stack.pop
+    end
+
+    def upd_sub(entry, block)
+      return @current[entry.keys[0].to_s] = entry.values[0].to_s if block.nil?
+      @current = @current[entry.to_s]
       block.call
     end
   end
