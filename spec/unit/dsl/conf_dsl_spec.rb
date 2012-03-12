@@ -34,7 +34,32 @@ describe "ConfDSL" do
 
     context "sub" do
 
-      it "sub" do
+      it "feature feature" do
+        platform_descriptor =<<-END
+          add :f_0 do
+            _ :sub_0 do
+              _ :key_0 => 'val 0'
+              _ :key_1 => 'val 1'
+            end
+          end
+
+          add :f_1 do
+            _ :sub_0 do
+              _ :key_0 => 'val 0'
+              _ :key_1 => 'val 1'
+            end
+          end
+        END
+        expected = {
+          'f_0' => { 'sub_0' => {'key_0' => 'val 0', 'key_1' => 'val 1'}},
+          'f_1' => { 'sub_0' => {'key_0' => 'val 0', 'key_1' => 'val 1'}}
+        }
+
+        @dsl.instance_eval platform_descriptor
+        @dsl.content.should == expected
+      end
+
+      it "feature-sub" do
         platform_descriptor =<<-END
           add :feature do
             _ :sub_0 do
@@ -53,7 +78,7 @@ describe "ConfDSL" do
         @dsl.content.should == expected
       end
 
-      it "sub sub" do
+      it "feature-{sub sub}" do
         platform_descriptor =<<-END
           add :feature do
             _ :sub_0 do
@@ -78,7 +103,7 @@ describe "ConfDSL" do
         @dsl.content.should == expected
       end
 
-      it "sub-sub sub" do
+      it "feature-{sub-sub sub}" do
         platform_descriptor =<<-END
           add :feature do
             _ :sub_0 do
@@ -111,7 +136,7 @@ describe "ConfDSL" do
         @dsl.content.should == expected
       end
 
-      it "sub-sub sub sub-sub" do
+      it "feature-{sub-sub sub sub-sub}" do
         platform_descriptor =<<-END
           add :feature do
             _ :sub_0 do
@@ -234,28 +259,72 @@ describe "ConfDSL" do
 
   describe ".upd" do
 
-    it "one entry" do
-      @dsl.content = { 'key_0' => 'val 0', 'key_1' => 'val 1' }
-      platform_descriptor =<<-END
-        upd :key_0 => 'upd 0'
-      END
-      expected = { 'key_0' => 'upd 0', 'key_1' => 'val 1' }
+    context "simple" do
 
-      @dsl.instance_eval platform_descriptor
-      @dsl.content.should == expected
-    end
+      it "one entry" do
+        @dsl.content = { 'key_0' => 'val 0', 'key_1' => 'val 1' }
+        platform_descriptor =<<-END
+          upd :key_0 => 'upd 0'
+        END
+        expected = { 'key_0' => 'upd 0', 'key_1' => 'val 1' }
 
-    it "multi entries" do
-      @dsl.content = { 'key_0' => 'val 0', 'key_1' => 'val 1' }
-      platform_descriptor =<<-END
-        upd :key_0 => 'upd 0'
-        upd :key_1 => 'upd 1'
-      END
-      expected = { 'key_0' => 'upd 0', 'key_1' => 'upd 1' }
+        @dsl.instance_eval platform_descriptor
+        @dsl.content.should == expected
+      end
 
-      @dsl.instance_eval platform_descriptor
-      @dsl.content.should == expected
-    end
+      it "multi entries" do
+        @dsl.content = { 'key_0' => 'val 0', 'key_1' => 'val 1' }
+        platform_descriptor =<<-END
+          upd :key_0 => 'upd 0'
+          upd :key_1 => 'upd 1'
+        END
+        expected = { 'key_0' => 'upd 0', 'key_1' => 'upd 1' }
+
+        @dsl.instance_eval platform_descriptor
+        @dsl.content.should == expected
+      end
+    end  # context - simple
+
+    context "sub" do
+
+      it "raises error on unknown entry"
+
+      it "sub" do
+        pending 'WIP'
+        @dsl.content = {
+          'feature' => {
+             'sub_0' => {'key_0' => 'val 0', 'key_1' => 'val 1'}
+          }
+        }
+        platform_descriptor =<<-END
+          upd :feature do
+            _ :sub_0 do
+              _ :key_0 => 'upd 0'
+            end
+          end
+        END
+        expected = {
+          'feature' => {
+             'sub_0' => {'key_0' => 'upd 0', 'key_1' => 'val 1'}
+          }
+        }
+
+        @dsl.instance_eval platform_descriptor
+        @dsl.content.should == expected
+      end
+
+      it "sub sub"
+
+      it "sub-sub sub"
+
+      it "sub-sub sub sub-sub"
+    end  # context - sub
+
+    context "@sub" do
+      it "@sub @sub"
+
+      it "@sub @sub @tub @tub"
+    end  # context - @sub
   end  # describe - upd
 
   describe ".del" do

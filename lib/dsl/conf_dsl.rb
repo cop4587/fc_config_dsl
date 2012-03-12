@@ -8,6 +8,8 @@ module Deployment
     def initialize
       @stack = []
       @stack.push Hash.new
+
+      @keys = []
     end
 
     def content
@@ -20,33 +22,26 @@ module Deployment
     end
 
     def add(entry, &block)
-      if block.nil?
-        @stack.last.merge! stringify(entry)
-      else
-        feature = {}
-        @stack.last[entry.to_s] = feature
-        @stack.push feature
-        block.call
-      end
+      return @stack.last.merge!(stringify(entry)) if block.nil?
+      push_hash_to_stack(entry, block)
+      @stack.pop
     end
 
     def _(entry, &block)
-      if block.nil?
-        @stack.last.merge! stringify(entry)
-      else
-        sub = {}
-        @stack.last[entry.to_s] = sub
-        @stack.push sub
-        block.call
-        @stack.pop
-      end
+      return @stack.last.merge! stringify(entry) if block.nil?
+      push_hash_to_stack(entry, block)
+      @stack.pop
     end
 
-    def upd(entry)
+    def upd(entry, &block)
       key = entry.keys[0].to_s
       raise "Entry to upd not found - #{key}" unless content[key]
 
-      @stack.first[key] = entry.values[0].to_s
+      return @stack.last[key] = entry.values[0].to_s if block.nil?
+
+      @keys.clear
+      @keys.push entry
+      block.call
     end
 
     def del(key)
@@ -64,6 +59,15 @@ module Deployment
       FileUtils.mkpath(dir) unless File.exist? dir
       File.open(path, 'w') { |f| Conf.dump(content, f) }
     end
+
+    private
+
+    def push_hash_to_stack(entry, block)
+      hash = {}
+      @stack.last[entry.to_s] = hash
+      @stack.push hash
+      block.call
+    end
   end
 
   class Conf
@@ -79,7 +83,8 @@ module Deployment
 
     def self.load_lines(lines, root_hash, current_hash)
       lines[0].start_with?('[')?
-          load_feature(lines, root_hash) : load_entry(lines, root_hash, current_hash) unless lines.empty?
+          load_feature(lines, root_hash)
+            : load_entry(lines, root_hash, current_hash) unless lines.empty?
     end
 
     def self.load_feature(lines, root_hash)
