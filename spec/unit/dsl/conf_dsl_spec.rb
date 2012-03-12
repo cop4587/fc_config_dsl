@@ -340,9 +340,62 @@ describe "ConfDSL" do
         @dsl.content.should == expected
       end
 
-      it "sub-sub sub"
+      it "feature-{sub-sub sub}" do
+        @dsl.content = {
+          'feature' => {
+             'sub_0' => {'key_00' => 'val 00', 'key_01' => 'val 01', 'sub_sub' => {'kkk' => 'vvv'}},
+             'sub_1' => {'key_10' => 'val 10', 'key_11' => 'val 11'}
+          }
+        }
+        platform_descriptor =<<-END
+          upd :feature do
+            _ :sub_0 do
+              _ :sub_sub do
+                _ :kkk => 'upd'
+              end
+            end
+            _ :sub_1 do
+              _ :key_11 => 'upd 11'
+            end
+          end
+        END
+        expected = {
+          'feature' => {
+             'sub_0' => {'key_00' => 'val 00', 'key_01' => 'val 01', 'sub_sub' => {'kkk' => 'upd'}},
+             'sub_1' => {'key_10' => 'val 10', 'key_11' => 'upd 11'}
+          }
+        }
 
-      it "sub-sub sub sub-sub"
+        @dsl.instance_eval platform_descriptor
+        @dsl.content.should == expected
+      end
+
+      it "feature-{sub-sub} feature-{sub-sub}" do
+        @dsl.content = {
+          'f_0' => { 'sub_0' => {'key_0' => 'val 0', 'key_1' => 'val 1'}},
+          'f_1' => { 'sub_0' => {'key_0' => 'val 0', 'key_1' => 'val 1'}}
+        }
+        platform_descriptor =<<-END
+          upd :f_0 do
+            _ :sub_0 do
+              _ :key_0 => 'upd 0'
+            end
+          end
+
+          upd :f_1 do
+            _ :sub_0 do
+              _ :key_1 => 'upd 1'
+            end
+          end
+        END
+        expected = {
+          'f_0' => { 'sub_0' => {'key_0' => 'upd 0', 'key_1' => 'val 1'}},
+          'f_1' => { 'sub_0' => {'key_0' => 'val 0', 'key_1' => 'upd 1'}}
+        }
+
+        @dsl.instance_eval platform_descriptor
+        @dsl.content.should == expected
+      end
     end  # context - sub
 
     context "@sub" do
