@@ -20,7 +20,9 @@ module Deployment
     def initialize
       @stack = []
       @stack.push Hash.new
-      @current = content
+
+      @upd_stack = []
+      @upd_stack.push content
     end
 
     def content
@@ -72,9 +74,12 @@ module Deployment
     end
 
     def upd_sub(entry, block)
-      return @current[entry.keys[0].to_s] = entry.values[0].to_s if block.nil?
-      @current = @current[entry.to_s]
+      return @upd_stack.last[entry.keys[0].to_s] = entry.values[0].to_s if block.nil?
+
+      @upd_stack.push @upd_stack.last[entry.to_s]
+
       block.call
+      @upd_stack.pop
     end
   end
 
