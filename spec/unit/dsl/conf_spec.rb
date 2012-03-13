@@ -167,7 +167,8 @@ s1k1 : s1v1
     end # describe - loads with sub(s)
 
     describe ".dumps" do
-      it "sub" do
+      
+      it "feature-sub" do
         content = { 'feature' => { 'sub' => {'key_0' => 'val 0', 'key_1' => 'val 1'}}}
         file = StringIO.new
         expected =<<-EOF
@@ -181,7 +182,7 @@ key_1 : val 1
         file.string.should == expected
       end
 
-      it "sub-sub" do
+      it "feature-sub-sub" do
         content = { 'feature' => { 'sub' => {'key_0' => 'val 0', 'sub_sub' => {'key_00' => 'val 00'}}}}
         file = StringIO.new
         expected =<<-EOF
@@ -196,7 +197,7 @@ key_00 : val 00
         file.string.should == expected
       end
 
-      it "sub sub" do
+      it "feature-{sub sub}" do
         content = { 'feature' => {
           'sub_0' => {'s0_k0' => 's0 v0', 's0_k1' => 's0 v1'},
           'sub_1' => {'s1_k0' => 's1 v0', 's1_k1' => 's1 v1'}}}
@@ -215,9 +216,10 @@ s1_k1 : s1 v1
         file.string.should == expected
       end
 
-      it "sub-sub sub" do
+      it "feature-{sub-sub sub}" do
         content = { 'feature' => {
-          'sub_0' => {'s0_k0' => 's0 v0', 'sub_0_0' => {'s0_s0_k0' => 's0 s0 v0'}},
+          'sub_0' => {'s0_k0' => 's0 v0',
+                      'sub_0_0' => {'s0_s0_k0' => 's0 s0 v0'}},
           'sub_1' => {'s1_k0' => 's1 v0', 's1_k1' => 's1 v1'}}}
         file = StringIO.new
         expected =<<-EOF
@@ -235,7 +237,7 @@ s1_k1 : s1 v1
         file.string.should == expected
       end
 
-      it "sub-sub-sub sub sub-sub" do
+      it "feature-{sub-sub-sub sub sub-sub}" do
         content = {
           'feature' => {
             'sub_0' => {'s0_k0' => 's0 v0',
@@ -275,7 +277,7 @@ s2_s0_k0 : s2 s0 v0
     describe ".loads" do
 
       it "@sub @sub" do
-        pending 'To Be Decided - how content contains array'
+        pending 'WIP'
         content =<<-EOF
 [feature]
 [.@sub]
@@ -315,17 +317,34 @@ lib : kkk
 
     describe ".dumps" do
 
-      it "@sub @sub" do
+      it "@feature @feature" do
         content = {
           'feature' => {
-            'sub' => [
-              {0 => {'host' => 'foo', 'lib' => 'vvv'}},
-              {1 => {'host' => 'bar', 'lib' => 'kkk'}}
-            ]
-          }
-        }
-        file = StringIO.new
+            '0' => {'host' => 'foo', 'lib' => 'vvv'},
+            '1' => {'host' => 'bar', 'lib' => 'kkk'}}}
 
+        file = StringIO.new
+        expected =<<-EOF
+[@feature]
+host : foo
+lib : vvv
+[@feature]
+host : bar
+lib : kkk
+        EOF
+
+        Deployment::Conf.dump(content, file)
+        file.string.should == expected
+      end
+
+      it "feature-{@sub @sub}" do
+        content = {
+          'feature' => {
+            'sub' => {
+               '0' => {'host' => 'foo', 'lib' => 'vvv'},
+               '1' => {'host' => 'bar', 'lib' => 'kkk'}}}}
+
+        file = StringIO.new
         expected =<<-EOF
 [feature]
 [.@sub]
@@ -340,25 +359,31 @@ lib : kkk
         file.string.should == expected
       end
 
-      it "@sub-sub @sub" do
+      it "feature-{@sub @sub} feather-{@tub @tub}" do
         content = {
           'feature' => {
-            'sub' => [
-              { 0 => {'host' => 'foo', 'lib' => 'vvv', 'sub_0_0' => {'s0_s0_k0' => 's0 s0 v0', 's0_s0_k1' => 's0 s0 v1'}}},
-              { 1 => {'host' => 'bar', 'lib' => 'kkk'}}
-            ]
-          }
-        }
+            'sub' => {
+               '0' => {'host' => 'foo', 'lib' => 'vvv'},
+               '1' => {'host' => 'bar', 'lib' => 'kkk'}}},
+          'feather' => {
+            'tub' => {
+               '0' => {'host' => 'foo', 'lib' => 'vvv'},
+               '1' => {'host' => 'bar', 'lib' => 'kkk'}}}}
+
         file = StringIO.new
         expected =<<-EOF
 [feature]
 [.@sub]
 host : foo
 lib : vvv
-[..sub_0_0]
-s0_s0_k0 : s0 s0 v0
-s0_s0_k1 : s0 s0 v1
 [.@sub]
+host : bar
+lib : kkk
+[feather]
+[.@tub]
+host : foo
+lib : vvv
+[.@tub]
 host : bar
 lib : kkk
         EOF
@@ -367,26 +392,64 @@ lib : kkk
         file.string.should == expected
       end
 
-      it "@sub-sub @sub @lib @lib" do
+      it "feature-{@sub-tub @sub}" do
         content = {
           'feature' => {
-            'sub' => [
-              { 0 => {'host' => 'foo', 'lib' => 'vvv', 'sub_0_0' => {'s0_s0_k0' => 's0 s0 v0', 's0_s0_k1' => 's0 s0 v1'}}},
-              { 1 => {'host' => 'bar', 'lib' => 'kkk'}}
-            ],
-            'lib' => [
-              { 0 => {'l_k_0' => 'foo', 'l_k_1' => 'buz'}},
-              { 1 => {'l_k_0' => 'bar', 'a_key' => 'a val'}}
-            ]
-          }
-        }
+            'sub' => {
+              '0' => {
+                'hot' => 'foo',
+                'lib' => 'bar',
+                'tub' => {
+                  'tub_k_0' => 'tub v 0',
+                  'tub_k_1' => 'tub v 1'}},
+              '1' => {
+                'hot' => 'lll',
+                'lib' => 'vvv'}}}}
+        file = StringIO.new
+        expected =<<-EOF
+[feature]
+[.@sub]
+hot : foo
+lib : bar
+[..tub]
+tub_k_0 : tub v 0
+tub_k_1 : tub v 1
+[.@sub]
+hot : lll
+lib : vvv
+        EOF
+
+        Deployment::Conf.dump(content, file)
+        file.string.should == expected
+      end
+
+      it "feature-{@sub-tub @sub @lib @lib}" do
+        content = {
+          'feature' => {
+            'sub' => {
+              '0' => {
+                'host' => 'foo',
+                'lib' => 'vvv',
+                'tub' => {
+                  's0_s0_k0' => 's0 s0 v0',
+                  's0_s0_k1' => 's0 s0 v1'}},
+              '1' => {
+                'host' => 'bar',
+                'lib' => 'kkk'}},
+            'lib' => {
+              '0' => {
+                'l_k_0' => 'foo',
+                'l_k_1' => 'buz'},
+              '1' => {
+                'l_k_0' => 'bar',
+                'a_key' => 'a val'}}}}
         file = StringIO.new
         expected =<<-EOF
 [feature]
 [.@sub]
 host : foo
 lib : vvv
-[..sub_0_0]
+[..tub]
 s0_s0_k0 : s0 s0 v0
 s0_s0_k1 : s0 s0 v1
 [.@sub]
@@ -404,25 +467,29 @@ a_key : a val
         file.string.should == expected
       end
 
-      it "sub-sub-@lib @lib sub" do
+      it "feature-{sub-tub-{@lib @lib} sub}" do
         content = {
           'feature' => {
-            'sub_0' => {'key_0' => 'val 0', 'sub_sub' => {
-              'key_00' => 'val 00',
-              'lib' => [
-                  {0 => {'s0_s0_k0' => 's0 s0 v0 foo', 's0_s0_k1' => 's0 s0 v1 foo'}},
-                  {1 => {'s0_s0_k0' => 's0 s0 v0 bar', 's0_s0_k1' => 's0 s0 v1 bar'}},
-              ]}
-            },
-            'sub_1' => {'key_1' => 'val 1', 'key_2' => 'val 2'}
-          }
-        }
+            'sub_0' => {
+              'key_0' => 'val 0',
+              'tub' => {
+                'key_00' => 'val 00',
+                'lib' => {
+                  '0' => {
+                    's0_s0_k0' => 's0 s0 v0 foo',
+                    's0_s0_k1' => 's0 s0 v1 foo'},
+                  '1' => {
+                    's0_s0_k0' => 's0 s0 v0 bar',
+                    's0_s0_k1' => 's0 s0 v1 bar'}}}},
+            'sub_1' => {
+              'key_1' => 'val 1',
+              'key_2' => 'val 2'}}}
         file = StringIO.new
         expected =<<-EOF
 [feature]
 [.sub_0]
 key_0 : val 0
-[..sub_sub]
+[..tub]
 key_00 : val 00
 [...@lib]
 s0_s0_k0 : s0 s0 v0 foo
@@ -440,5 +507,4 @@ key_2 : val 2
       end
     end  # describe - dumps
   end  # context - with @sub(s)
-
 end

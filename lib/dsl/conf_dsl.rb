@@ -1,5 +1,11 @@
 require_relative '../util/hash_util'
 
+class Hash
+  def has_at_sub?
+    keys[0] =~ /^\d+$/
+  end
+end
+
 module Deployment
 
   module AddDSL
@@ -75,9 +81,7 @@ module Deployment
 
     def upd_sub(entry, block)
       return @upd_stack.last[entry.keys[0].to_s] = entry.values[0].to_s if block.nil?
-
       @upd_stack.push @upd_stack.last[entry.to_s]
-
       block.call
       @upd_stack.pop
     end
@@ -110,8 +114,13 @@ module Deployment
 
       end
 
-
       hash_at(nesting_levels, root_hash)[key_of_line] = current_hash
+      load_lines(lines[1..-1], root_hash, current_hash)
+    end
+
+    def self.load_entry(lines, root_hash, current_hash)
+      key, value = lines[0].strip.split SEPARATOR
+      current_hash[key] = value
       load_lines(lines[1..-1], root_hash, current_hash)
     end
 
@@ -123,12 +132,6 @@ module Deployment
       root_hash.instance_eval hash_nested
     end
 
-    def self.load_entry(lines, root_hash, current_hash)
-      key, value = lines[0].strip.split SEPARATOR
-      current_hash[key] = value
-      load_lines(lines[1..-1], root_hash, current_hash)
-    end
-
     def self.key_of(line)
       prefix = line.scan /^(\[\.*)/
       line[prefix[0][0].size..-2]
@@ -136,41 +139,40 @@ module Deployment
 
     def self.dump(content, file, level=0)
       content.each_pair do |name, body|
-        if has_sub_feature? body
-          feature name, level, file
-          dump body, file, level+1
-        elsif has_sub_array? body
-          body.each do |at_sub|
-            at_sub.each_pair do |index, entries|
-              array name, level, file
-              dump entries, file, level+1
-            end
-          end
-        else
-          entry name, body, file
-        end
+        next dump_entry(name, body, file) unless body.is_a? Hash
+        dump_body(name, body, file, level)
       end
+    end
+
+    def self.dump_body(name, body, file, level)
+      if body.has_at_sub? and Integer(body.keys[0]) == 0
+        @at_sub_name, @at_sub_level, @at_sub_size  = name, level, body.keys.size
+        dump(body, file, level)
+      else
+        if is_a_at_sub?(name)
+          dump_array(@at_sub_name, @at_sub_level, file)
+        else
+          dump_feature(name, level, file)
+        end
+        dump(body, file, level+1)
+      end
+    end
+
+    def self.is_a_at_sub?(name)
+      name =~ /^\d+$/ and Integer(name) < @at_sub_size
     end
 
     private
 
-    def self.has_sub_feature?(body)
-      body.is_a? Hash
-    end
-
-    def self.has_sub_array?(body)
-      body.is_a? Array
-    end
-
-    def self.feature(name, level, file)
+    def self.dump_feature(name, level, file)
       file.puts "[#{'.'*level}#{name}]"
     end
 
-    def self.array(name, level, file)
+    def self.dump_array(name, level, file)
       file.puts "[#{'.'*level}@#{name}]"
     end
 
-    def self.entry(name, body, file)
+    def self.dump_entry(name, body, file)
       file.puts "#{name}#{SEPARATOR}#{body}"
     end
   end
