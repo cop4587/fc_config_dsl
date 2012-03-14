@@ -44,7 +44,7 @@ key_1 : val 1
         loaded.should == expected
       end
 
-      it "sub" do
+      it "feature-sub" do
         content =<<-EOF
 [feature]
 [.sub]
@@ -58,7 +58,7 @@ key_1 : val 1
         loaded.should == expected
       end
 
-      it "sub-sub" do
+      it "feature-sub-sub" do
         content =<<-EOF
 [feature]
 [.sub]
@@ -76,7 +76,37 @@ key_01 : val 01
         loaded.should == expected
       end
 
-      it "sub sub" do
+      it "feature-sub-sub teacher" do
+        content =<<-EOF
+[feature]
+[.sub]
+key_0 : val 0
+key_1 : val 1
+[..sub_sub]
+key_00 : val 00
+key_01 : val 01
+[teacher]
+hot : lll
+lib : vvv
+        EOF
+        file = StringIO.new content
+        expected = {
+          'feature' => {
+            'sub' => {
+              'key_0' => 'val 0',
+              'key_1' => 'val 1',
+              'sub_sub' => {
+                'key_00' => 'val 00',
+                'key_01' => 'val 01' }}},
+          'teacher' => {
+            'hot' => 'lll',
+            'lib' => 'vvv' }}
+
+        loaded = Deployment::Conf.load_file(file)
+        loaded.should == expected
+      end
+
+      it "feature-{sub sub}" do
         content =<<-EOF
 [feature]
 [.sub]
@@ -94,31 +124,7 @@ tey_1 : tal 1
         loaded.should == expected
       end
 
-      it "sub-sub-sub" do
-        content =<<-EOF
-[feature]
-[.sub]
-key_0 : val 0
-key_1 : val 1
-[..sub_sub]
-key_00 : val 00
-key_01 : val 01
-[...sub_sub_sub]
-key_000 : val 000
-key_001 : val 001
-        EOF
-        file = StringIO.new content
-        expected = { 'feature' => { 'sub' => {'key_0' => 'val 0', 'key_1' => 'val 1',
-                                              'sub_sub' => {'key_00' => 'val 00',
-                                                            'key_01' => 'val 01',
-                                                            'sub_sub_sub' => {'key_000' => 'val 000',
-                                                                              'key_001' => 'val 001'}}}}}
-
-        loaded = Deployment::Conf.load_file(file)
-        loaded.should == expected
-      end
-
-      it "sub-sub sub" do
+      it "feature-{sub-sub sub}" do
         content =<<-EOF
 [feature]
 [.sub_0]
@@ -140,7 +146,7 @@ s1k1 : s1v1
         loaded.should == expected
       end
 
-      it "k:v sub-sub sub" do
+      it "k:v feature-{sub-sub sub}" do
         content =<<-EOF
 key : val
 [feature]
@@ -269,41 +275,54 @@ s2_s0_k0 : s2 s0 v0
         Deployment::Conf.dump(content, file)
         file.string.should == expected
       end
-    end  # describe - dumps with subs
+    end  # describe - dumps
   end  # context - with sub(s)
 
   context "with @sub(s)" do
 
     describe ".loads" do
 
-      it "@sub @sub" do
-        pending 'WIP'
+      it "feature-{@sub @sub}" do
+        pending 'test cases interfere with each other'
         content =<<-EOF
 [feature]
 [.@sub]
-host : foo
-lib : vvv
+hot : foo
+lib : bar
 [.@sub]
-host : bar
-lib : kkk
+hot : lll
+lib : vvv
         EOF
         file = StringIO.new content
-
         expected = {
           'feature' => {
-            'sub' => [
-              {'host' => 'foo', 'lib' => 'vvv'},
-              {'host' => 'bar', 'lib' => 'kkk'}
-            ]
-          }
-        }
-
+            'sub' => {
+              '0' => {'hot' => 'foo', 'lib' => 'bar'},
+              '1' => {'hot' => 'lll', 'lib' => 'vvv'}}}}
         loaded = Deployment::Conf.load_file(file)
         loaded.should == expected
       end
 
-      it "@sub-sub @sub" do
-        pending 'To Be Decided - how content contains array'
+      it "feature-{@sub-tub @sub}" do
+        content =<<-EOF
+[feature]
+[.@sub]
+hot : foo
+lib : bar
+[..tub]
+key : val
+[.@sub]
+hot : lll
+lib : vvv
+        EOF
+        file = StringIO.new content
+        expected = {
+          'feature' => {
+            'sub' => {
+              '0' => {'hot' => 'foo', 'lib' => 'bar', 'tub' => { 'key' => 'val'}},
+              '1' => {'hot' => 'lll', 'lib' => 'vvv'}}}}
+        loaded = Deployment::Conf.load_file(file)
+        loaded.should == expected
       end
 
       it "@sub-sub @sub @lib @lib" do

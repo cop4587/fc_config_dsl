@@ -4,6 +4,14 @@ class Hash
   def has_at_sub?
     keys[0] =~ /^\d+$/
   end
+
+  def value_of(name)
+    return self[name] if self.key?(name)
+    values.each do |value|
+      return value.value_of(name) if value.is_a? Hash
+    end
+    return nil
+  end
 end
 
 module Deployment
@@ -100,22 +108,46 @@ module Deployment
 
     def self.load_lines(lines, root_hash, current_hash)
       lines[0].start_with?('[')?
-          load_feature(lines, root_hash)
-            : load_entry(lines, root_hash, current_hash) unless lines.empty?
+        load_feature(lines, root_hash)
+          : load_entry(lines, root_hash, current_hash) unless lines.empty?
     end
 
     def self.load_feature(lines, root_hash)
       line = lines[0].strip
-      nesting_levels = line.scan(/^(\[\.*)/)[0][0].size - 1  # '[' = 0, '[.' = 1, '[..' = 2
+      nesting_levels = line.scan(/^(\[\.*)/)[0][0].size - 1  # e.g., '[' = 0, '[.' = 1, '[..' = 2
       current_hash = {}
 
-      key_of_line = key_of line
-      if key_of_line.start_with?('@')
+      if is_a_at_sub?(line)
+        if first_of_at_sub?(line)
+          @at_sub_name = key_of(line)[1..-1]
+          @at_sub_counter = (0..lines.join.scan(key_of(line)).size - 1).to_a
 
+          hash_at(nesting_levels, root_hash)[@at_sub_name] = current_hash
+
+          at_sub_index = @at_sub_counter.shift
+          a_at_sub = {}
+          current_hash[at_sub_index.to_s] = a_at_sub
+        else
+          return if @at_sub_counter.empty?
+          at_sub_index = @at_sub_counter.shift
+          a_at_sub = {}
+          root_hash.value_of(@at_sub_name)[at_sub_index.to_s] = a_at_sub
+        end
+
+        load_lines(lines[1..-1], root_hash, a_at_sub)
+      else
+        hash_at(nesting_levels, root_hash)[key_of(line)] = current_hash
+        load_lines(lines[1..-1], root_hash, current_hash)
       end
+    end
 
-      hash_at(nesting_levels, root_hash)[key_of_line] = current_hash
-      load_lines(lines[1..-1], root_hash, current_hash)
+
+    def self.first_of_at_sub?(line)
+      @at_sub_name != key_of(line)[1..-1]
+    end
+
+    def self.is_a_at_sub?(line)
+      key_of(line).start_with?('@')
     end
 
     def self.load_entry(lines, root_hash, current_hash)
@@ -146,10 +178,10 @@ module Deployment
 
     def self.dump_body(name, body, file, level)
       if body.has_at_sub? and Integer(body.keys[0]) == 0
-        @at_sub_name, @at_sub_level, @at_sub_size  = name, level, body.keys.size
+        @at_sub_name, @at_sub_level, @at_sub_count  = name, level, body.keys.size
         dump(body, file, level)
       else
-        if is_a_at_sub?(name)
+        if is_a_at_sub_item?(name)
           dump_array(@at_sub_name, @at_sub_level, file)
         else
           dump_feature(name, level, file)
@@ -158,8 +190,8 @@ module Deployment
       end
     end
 
-    def self.is_a_at_sub?(name)
-      name =~ /^\d+$/ and Integer(name) < @at_sub_size
+    def self.is_a_at_sub_item?(name)
+      name =~ /^\d+$/ and Integer(name) < @at_sub_count
     end
 
     private

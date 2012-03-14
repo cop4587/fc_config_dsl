@@ -184,7 +184,7 @@ describe "ConfDSL" do
 
     context "@sub" do
 
-      it "@sub @sub" do
+      it "feature-{@sub @sub}" do
         platform_descriptor =<<-END
           add :feature do
             _ :sub do
@@ -212,7 +212,7 @@ describe "ConfDSL" do
         @dsl.content.should == expected
       end
 
-      it "@sub @sub @tub @tub" do
+      it "feature-{@sub @sub @tub @tub}" do
         platform_descriptor =<<-END
           add :feature do
             _ :sub do
