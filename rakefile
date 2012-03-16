@@ -5,6 +5,8 @@ task :default => ['spec:all']
 
 namespace :gem do
 
+  @version = '0.0.5'
+
   task :uninstall do
     sh "gem uninstall -x fc_config"
   end
@@ -14,11 +16,15 @@ namespace :gem do
   end
 
   task :install do
-    sh "gem install fc_config-0.0.3.gem"
+    sh "gem install fc_config-#{@version}.gem"
+  end
+
+  task :clear do
+    sh "rm -f fc_config-0.0.#{@version[-1].to_i-1}.gem"
   end
 
   desc "Upgrade fc_config gem to the latest version"
-  task :upgrade => ['gem:build','gem:uninstall', 'gem:install']
+  task :upgrade => ['gem:build','gem:uninstall', 'gem:install', 'gem:clear']
 end
 
 namespace :spec do
