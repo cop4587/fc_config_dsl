@@ -27,14 +27,28 @@ namespace :spec do
 
   desc "Run unit specs"
   task :unit do
-    sh "rspec spec/unit/"
+    sh "rspec spec/unit/ -f doc"
   end
 
   desc "Run functional specs"
   task :func => [:clobber] do
-    FileUtils.cd "platform_descriptor/e4/"
+    FileUtils.cd "platform_descriptor/e1/"
+    puts "[e1: 1 module - yaml]"
+    sh "ruby ../../bin/fc_config e1.rb"
+
+    puts "\n[e2: 1 module - conf & gflags]"
+    FileUtils.cd "../e2"
+    sh "ruby ../../bin/fc_config e2.rb"
+
+    puts "\n[e3: 1 module - conf & yaml]"
+    FileUtils.cd "../e3"
+    sh "ruby ../../bin/fc_config e3.rb"
+
+    puts "\n[e4: 2 modules - conf & yaml]"
+    FileUtils.cd "../e4"
     sh "ruby ../../bin/fc_config e4.rb"
 
+    puts "\n[e5: inverse e4]"
     FileUtils.cd "../e5"
     sh "ruby ../../bin/fc_config e5.rb"
 

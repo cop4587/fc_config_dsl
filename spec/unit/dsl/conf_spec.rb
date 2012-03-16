@@ -25,7 +25,7 @@ key_2 : 2
       Deployment::Conf.dump(@content, file)
       file.string.should == expected
     end
-  end  # content - simple
+  end  # content simple
 
   context "with sub(s)" do
 
@@ -276,14 +276,13 @@ s2_s0_k0 : s2 s0 v0
         file.string.should == expected
       end
     end  # describe - dumps
-  end  # context - with sub(s)
+  end  # context with sub(s)
 
   context "with @sub(s)" do
 
     describe ".loads" do
 
       it "feature-{@sub @sub}" do
-        pending 'test cases interfere with each other'
         content =<<-EOF
 [feature]
 [.@sub]
@@ -304,6 +303,7 @@ lib : vvv
       end
 
       it "feature-{@sub-tub @sub}" do
+        pending "To Be Fixed"
         content =<<-EOF
 [feature]
 [.@sub]
@@ -325,14 +325,105 @@ lib : vvv
         loaded.should == expected
       end
 
-      it "@sub-sub @sub @lib @lib" do
-        pending 'To Be Decided - how content contains array'
+      it "@sub-sub @sub @lib @lib"
+
+      it "feature-{@sub @sub @tub @tub}" do
+        pending 'PASSED (interfere with others)'
+        content =<<-EOF
+[feature]
+[.@sub]
+hot : foo
+lib : bar
+[.@sub]
+hot : lll
+lib : vvv
+[.@tub]
+hot : foo
+lib : bar
+[.@tub]
+hot : lll
+lib : vvv
+        EOF
+        file = StringIO.new content
+        expected = {
+          'feature' => {
+            'sub' => {
+              '0' => {'hot' => 'foo', 'lib' => 'bar'},
+              '1' => {'hot' => 'lll', 'lib' => 'vvv'}},
+            'tub' => {
+              '0' => {'hot' => 'foo', 'lib' => 'bar'},
+              '1' => {'hot' => 'lll', 'lib' => 'vvv'}}}}
+        loaded = Deployment::Conf.load_file(file)
+        loaded.should == expected
       end
 
-      it "sub-sub-@lib @lib sub" do
-        pending 'To Be Decided - how content contains array'
+      it "feature-{@sub @sub-{@tub @tub}}" do
+        pending ""
+        content =<<-EOF
+[feature]
+[.@sub]
+hot : foo
+lib : bar
+[.@sub]
+hot : lll
+lib : vvv
+[..@tub]
+lot : foo
+sib : bar
+[..@tub]
+lot : lll
+sib : vvv
+        EOF
+        file = StringIO.new content
+        expected = {
+          'feature' => {
+            'sub' => {
+              '0' => {'hot' => 'foo', 'lib' => 'bar'},
+              '1' => {'hot' => 'lll', 'lib' => 'vvv',
+                      'tub' => {
+                        '0' => {'lot' => 'foo', 'sib' => 'bar'},
+                        '1' => {'lot' => 'lll', 'sib' => 'vvv'}}}}}}
+        loaded = Deployment::Conf.load_file(file)
+        loaded.should == expected
       end
-    end  # describe - loads
+
+      it "sub-sub-@lib @lib tub" do
+        pending 'To Be Fixed'
+        content =<<-EOF
+[feature]
+
+[.sub]
+key : val
+
+[..sub_sub]
+key : val
+
+[...@lib]
+hot : foo
+lib : bar
+
+[...@lib]
+hot : lll
+lib : vvv
+
+[.tub]
+key : val
+        EOF
+        file = StringIO.new content
+        expected = {
+          'feature' => {
+            'sub' => {
+              'key' => 'val',
+              'sub_sub' => {
+                'key' => 'val',
+                'lib' => {
+                  '0' => { 'hot' => 'foo', 'lib' => 'bar'},
+                  '1' => { 'hot' => 'lll', 'lib' => 'vvv'}}}},
+            'tub' => { 'key' => 'val'}}}
+        loaded = Deployment::Conf.load_file(file)
+        loaded.should == expected
+      end
+    end  # describe loads
 
     describe ".dumps" do
 
@@ -525,5 +616,5 @@ key_2 : val 2
         file.string.should == expected
       end
     end  # describe - dumps
-  end  # context - with @sub(s)
+  end  # context with @sub(s)
 end

@@ -58,16 +58,15 @@ module Deployment
       upd_sub entry, block
     end
 
-
-
     def del(key)
       key_s = key.to_s
-      raise "Entry to del not found - #{key_s}" unless content[key_s]
+      raise "Entry to del not found - #{key_s}" unless content.key? key_s
       @stack.first.delete key_s
     end
 
     def load(file)
-      content = File.exist?(file) ? Conf.load_file(File.open file) : {}
+      @stack.first.clear
+      @stack.first.merge!(File.exist?(file) ? Conf.load_file(File.open file) : {})
     end
 
     def dump(path)
@@ -96,6 +95,11 @@ module Deployment
   end
 
   class Conf
+
+    @at_sub_level = nil
+    @at_sub_count = nil
+    @at_sub_counter = nil
+    @at_sub_name = nil
 
     SEPARATOR  = ' : '
 
