@@ -5,7 +5,7 @@ task :default => ['spec:all']
 
 namespace :gem do
 
-  @version = '0.0.5'
+  @version = '0.0.6'
 
   task :uninstall do
     sh "gem uninstall -x fc_config"

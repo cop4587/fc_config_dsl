@@ -96,11 +96,6 @@ module Deployment
 
   class Conf
 
-    @at_sub_level = nil
-    @at_sub_count = nil
-    @at_sub_counter = nil
-    @at_sub_name = nil
-
     SEPARATOR  = ' : '
 
     def self.load_file(file)
@@ -109,6 +104,15 @@ module Deployment
       load_lines(lines, content, content)
       content
     end
+
+    def self.dump(content, file, level=0)
+      content.each_pair do |name, body|
+        next dump_entry(name, body, file) unless body.is_a? Hash
+        dump_body(name, body, file, level)
+      end
+    end
+
+    private
 
     def self.load_lines(lines, root_hash, current_hash)
       lines[0].start_with?('[')?
@@ -173,12 +177,7 @@ module Deployment
       line[prefix[0][0].size..-2]
     end
 
-    def self.dump(content, file, level=0)
-      content.each_pair do |name, body|
-        next dump_entry(name, body, file) unless body.is_a? Hash
-        dump_body(name, body, file, level)
-      end
-    end
+
 
     def self.dump_body(name, body, file, level)
       if body.has_at_sub? and Integer(body.keys[0]) == 0

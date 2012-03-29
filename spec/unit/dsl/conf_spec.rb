@@ -283,6 +283,7 @@ s2_s0_k0 : s2 s0 v0
     describe ".loads" do
 
       it "feature-{@sub @sub}" do
+        #pending
         content =<<-EOF
 [feature]
 [.@sub]
@@ -358,31 +359,36 @@ lib : vvv
       end
 
       it "feature-{@sub @sub-{@tub @tub}}" do
-        pending ""
+        pending
         content =<<-EOF
 [feature]
+
 [.@sub]
 hot : foo
 lib : bar
+
+[..@tub]
+a_key : a_val_0
+b_key : b_val_0
+
 [.@sub]
 hot : lll
 lib : vvv
+
 [..@tub]
-lot : foo
-sib : bar
-[..@tub]
-lot : lll
-sib : vvv
+a_key : a_val_1
+b_key : b_val_1
         EOF
         file = StringIO.new content
         expected = {
           'feature' => {
             'sub' => {
-              '0' => {'hot' => 'foo', 'lib' => 'bar'},
-              '1' => {'hot' => 'lll', 'lib' => 'vvv',
-                      'tub' => {
-                        '0' => {'lot' => 'foo', 'sib' => 'bar'},
-                        '1' => {'lot' => 'lll', 'sib' => 'vvv'}}}}}}
+              '0' => {'hot' => 'foo',
+                      'lib' => 'bar',
+                      'tub' => {'a_key' => 'a_val_0', 'b_key' => 'b_val_0'}},
+              '1' => {'hot' => 'lll',
+                      'lib' => 'vvv',
+                      'tub' => {'a_key' => 'a_val_1', 'b_key' => 'b_val_1'}}}}}
         loaded = Deployment::Conf.load_file(file)
         loaded.should == expected
       end
@@ -469,27 +475,27 @@ lib : kkk
         file.string.should == expected
       end
 
-      it "feature-{@sub @sub} feather-{@tub @tub}" do
+      it "this-{@sub @sub} that-{@tub @tub}" do
         content = {
-          'feature' => {
+          'this' => {
             'sub' => {
                '0' => {'host' => 'foo', 'lib' => 'vvv'},
                '1' => {'host' => 'bar', 'lib' => 'kkk'}}},
-          'feather' => {
+          'that' => {
             'tub' => {
                '0' => {'host' => 'foo', 'lib' => 'vvv'},
                '1' => {'host' => 'bar', 'lib' => 'kkk'}}}}
 
         file = StringIO.new
         expected =<<-EOF
-[feature]
+[this]
 [.@sub]
 host : foo
 lib : vvv
 [.@sub]
 host : bar
 lib : kkk
-[feather]
+[that]
 [.@tub]
 host : foo
 lib : vvv
